@@ -2,6 +2,8 @@ package com.naveenb2004;
 
 import lombok.NonNull;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.nio.ByteBuffer;
 
 public class ProtocolHandler {
@@ -23,13 +25,11 @@ public class ProtocolHandler {
         return buffer.array();
     }
 
-    protected void deserialize(@NonNull byte[] data) {
-        
-
-        for (int i = 0; i < data.length; i++) {
-            if (data[i] == '$') {
-
-            }
+    protected void deserialize(@NonNull InputStream inputStream)
+            throws IOException {
+        byte[] data;
+        while (true) {
+            inputStream.read();
         }
     }
 }
