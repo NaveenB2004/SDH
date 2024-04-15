@@ -1,13 +1,13 @@
 package com.naveenb2004;
 
 import lombok.NonNull;
+import lombok.SneakyThrows;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 
-public class DataProcessor {
+public class DataProcessor implements Runnable {
     protected static final byte[] startMarker = "$BEGIN$".getBytes(StandardCharsets.UTF_8);
     protected static final byte[] breakMarker = "$BREAK$".getBytes(StandardCharsets.UTF_8);
     protected static final byte[] endMarker = "$END$".getBytes(StandardCharsets.UTF_8);
@@ -40,11 +40,19 @@ public class DataProcessor {
         return bytes;
     }
 
-    protected void deserialize(@NonNull SocketDataHandler parent) throws IOException {
+    SocketDataHandler parent;
+
+    public DataProcessor(@NonNull SocketDataHandler parent) {
+        this.parent = parent;
+    }
+
+    @SneakyThrows
+    @Override
+    public void run() {
         InputStream in = parent.socket.getInputStream();
         byte[] data = null;
         while (parent.socket.isConnected()) {
-            
+
         }
     }
 }

@@ -16,7 +16,7 @@ public abstract class SocketDataHandler {
         if (bufferSize != 0) {
             this.bufferSize = bufferSize;
         }
-        new DataProcessor().deserialize(this);
+        new DataProcessor(this);
     }
 
     public void send(@NonNull DataHandler dataHandler) throws IOException {
