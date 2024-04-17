@@ -11,7 +11,7 @@ public abstract class SocketDataHandler {
     protected final Socket socket;
     protected int bufferSize = 1024;
 
-    public SocketDataHandler(@NonNull final Socket socket, int bufferSize) throws IOException {
+    public SocketDataHandler(@NonNull final Socket socket, int bufferSize) {
         this.socket = socket;
         if (bufferSize != 0) {
             this.bufferSize = bufferSize;
