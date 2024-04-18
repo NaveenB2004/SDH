@@ -21,11 +21,11 @@ public abstract class SocketDataHandler {
         OutputStream outputStream = socket.getOutputStream();
         byte[] data = DataProcessor.serialize(dataHandler);
 
-        for (int wroteBuff = 0; wroteBuff < data.length; wroteBuff += ioBufferSize) {
+        for (int wroteBuff = 0; wroteBuff < data.length; wroteBuff += ioBufferSize + 1) {
             if (data.length >= ioBufferSize) {
                 outputStream.write(data, wroteBuff, ioBufferSize);
             } else {
-                outputStream.write(data, wroteBuff, ioBufferSize - wroteBuff);
+                outputStream.write(data, wroteBuff, data.length - 1);
             }
         }
         outputStream.flush();

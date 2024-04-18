@@ -51,7 +51,7 @@ public class DataProcessor implements Runnable {
         while (inputStream.available() != 0) {
             byte[] buffer = new byte[headerSize];
             inputStream.read(buffer, 0, headerSize);
-
+            System.out.println("bytes received!");
             if (buffer[0] == '{' && buffer[headerSize - 1] == '}') {
                 String content = new String(Arrays.copyOfRange(buffer, 1, headerSize - 2),
                         StandardCharsets.UTF_8);
