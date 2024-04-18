@@ -11,11 +11,9 @@ public abstract class SocketDataHandler implements Closeable {
     protected final Socket socket;
     public static int ioBufferSize = 1024;
     public static int maxBodySize = 20 * 1024 * 1024;
-    protected final BufferedOutputStream bos;
 
-    public SocketDataHandler(@NonNull final Socket socket) throws IOException {
+    public SocketDataHandler(@NonNull final Socket socket) {
         this.socket = socket;
-        bos = new BufferedOutputStream(socket.getOutputStream());
         new DataProcessor(this);
     }
 
@@ -35,9 +33,6 @@ public abstract class SocketDataHandler implements Closeable {
     }
 
     public void close() throws IOException {
-        if (bos != null) {
-            bos.close();
-        }
         if (socket.isConnected()) {
             socket.close();
         }
