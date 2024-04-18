@@ -12,7 +12,7 @@ public abstract class SocketDataHandler {
     protected static int ioBufferSize = 1024;
     protected static int maxBodySize = 20 * 1024 * 1024;
 
-    public SocketDataHandler(@NonNull final Socket socket) throws IOException {
+    public SocketDataHandler(@NonNull final Socket socket) {
         this.socket = socket;
         new DataProcessor(this);
     }
