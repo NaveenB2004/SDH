@@ -1,17 +1,19 @@
 package com.naveenb2004;
 
-import lombok.Data;
+import lombok.Getter;
 import lombok.NonNull;
+import lombok.Setter;
 
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeParseException;
 
-@Data
+@Getter
+@Setter
 public class DataHandler {
     @NonNull
     private String title;
-    private String timestamp;
+    private String timestamp; // 2024-04-18T07:52:30.328585500
     @NonNull
     private byte[] data;
 
@@ -30,7 +32,7 @@ public class DataHandler {
             try {
                 LocalDateTime.parse(timestamp);
             } catch (DateTimeParseException e) {
-                throw new RuntimeException("Timestamp is invalid (should be a LocalDateTime)!");
+                throw new RuntimeException("Timestamp is invalid (should be in 'LocalDateTime' format)!");
             }
         }
         this.timestamp = timestamp;

@@ -8,11 +8,13 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.text.DecimalFormat;
+import java.util.Arrays;
 
 public class DataProcessor implements Runnable {
     private static final DecimalFormat TITLE = new DecimalFormat("00");
     private static final DecimalFormat TIMESTAMP = new DecimalFormat("00");
-    private static final DecimalFormat DATA = new DecimalFormat("00000000");
+    private static final DecimalFormat DATA
+            = new DecimalFormat("0".repeat(String.valueOf(SocketDataHandler.maxBodySize).length()));
 
     @NonNull
     protected static byte[] serialize(@NonNull DataHandler dataHandler) throws IOException {
@@ -35,16 +37,52 @@ public class DataProcessor implements Runnable {
     }
 
     @NonNull
-    InputStream inputStream;
+    SocketDataHandler sdh;
 
-    public DataProcessor(@NonNull InputStream inputStream) {
-        this.inputStream = inputStream;
+    public DataProcessor(@NonNull SocketDataHandler sdh) {
+        this.sdh = sdh;
     }
 
     @SneakyThrows
     @Override
     public void run() {
-// 16
+        int headerSize = 8 + String.valueOf(SocketDataHandler.maxBodySize).length();
+        InputStream inputStream = sdh.socket.getInputStream();
+        while (inputStream.available() != 0) {
+            byte[] buffer = new byte[headerSize];
+            inputStream.read(buffer, 0, headerSize);
 
+            if (buffer[0] == '{' && buffer[headerSize - 1] == '}') {
+                String content = new String(Arrays.copyOfRange(buffer, 1, headerSize - 2),
+                        StandardCharsets.UTF_8);
+                ByteArrayOutputStream baos = new ByteArrayOutputStream();
+
+                int titleSize = Integer.parseInt(content.split(",")[0]);
+                int timestampSize = Integer.parseInt(content.split(",")[1]);
+                int dataSize = Integer.parseInt(content.split(",")[2]);
+                int totalSize = titleSize + timestampSize + dataSize;
+
+                int i = 0;
+                while (i < totalSize) {
+                    byte[] chunk = new byte[SocketDataHandler.ioBufferSize];
+                    inputStream.read(chunk, 0, chunk.length);
+                    baos.write(chunk);
+                    i += SocketDataHandler.ioBufferSize;
+                }
+
+                byte[] body = baos.toByteArray();
+                String title = new String(Arrays.copyOfRange(body, 0, titleSize - 1),
+                        StandardCharsets.UTF_8);
+                String timestamp = new String(Arrays.copyOfRange(body, titleSize - 1, titleSize + timestampSize - 1),
+                        StandardCharsets.UTF_8);
+                byte[] data = Arrays.copyOfRange(body, titleSize + timestampSize - 1, totalSize - 1);
+
+                DataHandler dataHandler = new DataHandler();
+                dataHandler.setTitle(title);
+                dataHandler.setTimestamp(timestamp);
+                dataHandler.setData(data);
+                sdh.receive(dataHandler);
+            }
+        }
     }
 }

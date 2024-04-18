@@ -8,13 +8,13 @@ import java.net.Socket;
 
 public abstract class SocketDataHandler {
     @NonNull
-    private final Socket socket;
+    protected final Socket socket;
     protected static int ioBufferSize = 1024;
     protected static int maxBodySize = 20 * 1024 * 1024;
 
     public SocketDataHandler(@NonNull final Socket socket) throws IOException {
         this.socket = socket;
-        new DataProcessor(socket.getInputStream());
+        new DataProcessor(this);
     }
 
     public void send(@NonNull DataHandler dataHandler) throws IOException {
