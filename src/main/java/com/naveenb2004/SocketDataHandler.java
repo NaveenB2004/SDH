@@ -8,15 +8,13 @@ import java.net.Socket;
 
 public abstract class SocketDataHandler {
     @NonNull
-    protected final Socket socket;
-    protected int bufferSize = 1024;
+    private final Socket socket;
+    protected static int ioBufferSize = 1024;
+    protected static int maxBodySize = 20 * 1024 * 1024;
 
-    public SocketDataHandler(@NonNull final Socket socket, int bufferSize) {
+    public SocketDataHandler(@NonNull final Socket socket) throws IOException {
         this.socket = socket;
-        if (bufferSize != 0) {
-            this.bufferSize = bufferSize;
-        }
-        new DataProcessor(this);
+        new DataProcessor(socket.getInputStream());
     }
 
     public void send(@NonNull DataHandler dataHandler) throws IOException {
@@ -25,8 +23,8 @@ public abstract class SocketDataHandler {
 
         int wroteBuff = 0;
         while (wroteBuff < data.length) {
-            outputStream.write(data, wroteBuff, bufferSize);
-            wroteBuff += bufferSize;
+            outputStream.write(data, wroteBuff, ioBufferSize);
+            wroteBuff += ioBufferSize;
         }
         outputStream.flush();
     }
