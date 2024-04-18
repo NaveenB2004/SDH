@@ -7,22 +7,26 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
-import java.time.LocalDateTime;
+import java.text.DecimalFormat;
 
 public class DataProcessor implements Runnable {
+    private static final DecimalFormat TITLE = new DecimalFormat("00");
+    private static final DecimalFormat TIMESTAMP = new DecimalFormat("00");
+    private static final DecimalFormat DATA = new DecimalFormat("00000000");
 
     @NonNull
     protected static byte[] serialize(@NonNull DataHandler dataHandler) throws IOException {
-        if (dataHandler.getTimestamp() == null) {
-            LocalDateTime now = LocalDateTime.now();
-            dataHandler.setTimestamp(now.toString());
-        }
-
         byte[] titleBytes = dataHandler.getTitle().getBytes(StandardCharsets.UTF_8);
         byte[] timestampBytes = dataHandler.getTimestamp().getBytes(StandardCharsets.UTF_8);
         byte[] bodyBytes = dataHandler.getData();
 
+        String header = String.format("{%s,%s,%s}",
+                TITLE.format(titleBytes.length),
+                TIMESTAMP.format(timestampBytes.length),
+                DATA.format(bodyBytes.length));
+
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        baos.write(header.getBytes(StandardCharsets.UTF_8));
         baos.write(titleBytes);
         baos.write(timestampBytes);
         baos.write(bodyBytes);
@@ -40,7 +44,7 @@ public class DataProcessor implements Runnable {
     @SneakyThrows
     @Override
     public void run() {
-
+// 16
 
     }
 }
