@@ -3,7 +3,7 @@ import lombok.SneakyThrows;
 
 public class Main {
 
-    private static final int port = 2004;
+    public static final int port = 2004;
 
     @SneakyThrows
     public static void main(String[] args) {

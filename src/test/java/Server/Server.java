@@ -7,6 +7,10 @@ import java.net.ServerSocket;
 import java.net.Socket;
 
 public class Server {
+    public static void main(String[] args) {
+        new Server().connect(2004);
+    }
+
     public void connect(int port) {
         new Thread(() -> {
             try {
@@ -14,11 +18,10 @@ public class Server {
                 ServerSocket serverSocket = new ServerSocket(port);
                 System.out.println("Server started on port " + port);
 
-                int i = 1;
                 while (true) {
                     Socket socket = serverSocket.accept();
+                    System.out.println("Server : Client connected to server @  : " + socket.getRemoteSocketAddress());
                     new ClientsHandler(socket);
-                    System.out.println("Client connected to server @ id : " + i++);
                 }
             } catch (IOException e) {
                 throw new RuntimeException(e);

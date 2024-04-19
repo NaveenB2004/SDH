@@ -25,6 +25,7 @@ public class ClientsHandler extends SocketDataHandler {
 
     public void sendSamples() {
         new Thread(() -> {
+            System.out.println("Client : Sending samples...");
             for (int i = 0; i < 5; i++) {
                 try {
                     Thread.sleep(3000);
