@@ -13,18 +13,18 @@ import java.time.format.DateTimeParseException;
 public class DataHandler {
     @NonNull
     private String title;
-    private String timestamp; // 2024-04-18T07:52:30.328585500
+    private String timestamp; // LocalDateTime format (2024-04-18T07:52:30.328585500)
     @NonNull
     private byte[] data;
 
-    public void setTitle(@NonNull String title) {
+    public void setTitle(@NonNull String title) throws Exception {
         if (title.getBytes(StandardCharsets.UTF_8).length > 99) {
-            throw new RuntimeException("Title is too long (max 99 bytes)!");
+            throw new Exception("Title is too long (max 99 bytes)!");
         }
         this.title = title;
     }
 
-    public void setTimestamp(String timestamp) {
+    public void setTimestamp(String timestamp) throws DateTimeParseException {
         if (timestamp == null || timestamp.isEmpty()) {
             LocalDateTime now = LocalDateTime.now();
             timestamp = now.toString();
@@ -32,15 +32,16 @@ public class DataHandler {
             try {
                 LocalDateTime.parse(timestamp);
             } catch (DateTimeParseException e) {
-                throw new RuntimeException("Timestamp is invalid (should be in 'LocalDateTime' format)!");
+                throw new DateTimeParseException("Timestamp is invalid (should be in 'LocalDateTime' format)!",
+                        timestamp, 0);
             }
         }
         this.timestamp = timestamp;
     }
 
-    public void setData(@NonNull byte[] data) {
+    public void setData(@NonNull byte[] data) throws Exception {
         if (data.length > SocketDataHandler.maxBodySize) {
-            throw new RuntimeException("Data is too long (max " + SocketDataHandler.maxBodySize + " bytes)!");
+            throw new Exception("Data is too long (max " + SocketDataHandler.maxBodySize + " bytes)!");
         }
         this.data = data;
     }

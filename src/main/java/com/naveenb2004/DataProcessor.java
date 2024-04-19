@@ -50,11 +50,9 @@ public class DataProcessor implements Runnable {
 
     @Override
     public void run() {
-        System.out.println("Receiver initialized!");
         final int headerSize = 4 + String.valueOf(SocketDataHandler.maxBodySize).length();
         try {
             InputStream in = sdh.socket.getInputStream();
-            System.out.println("Lib : Receiving...");
             while (true) {
                 // read meta buffer
                 byte[] header = new byte[headerSize];
@@ -93,7 +91,7 @@ public class DataProcessor implements Runnable {
                 dh.setData(Arrays.copyOfRange(data, headerData[0] + headerData[1], dest));
                 sdh.receive(dh);
             }
-        } catch (IOException e) {
+        } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }

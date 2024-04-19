@@ -12,17 +12,15 @@ public abstract class SocketDataHandler implements Closeable {
     protected final Socket socket;
     private final Thread thread = new Thread(new DataProcessor(this));
     public static int ioBufferSize = 1024;
-    public static int maxBodySize = 20 * 1024 * 1024;
+    public static int maxBodySize = 5 * 1024 * 1024;
 
     public SocketDataHandler(@NonNull final Socket socket) {
         this.socket = socket;
         thread.start();
-        System.out.println("Lib : Worker thread started");
     }
 
     @Synchronized
     public void send(@NonNull DataHandler dataHandler) throws IOException {
-        System.out.println("Lib : Sending...");
         OutputStream os = socket.getOutputStream();
         byte[] buffer = new byte[ioBufferSize];
         ByteArrayInputStream data = DataProcessor.serialize(dataHandler);
@@ -35,7 +33,6 @@ public abstract class SocketDataHandler implements Closeable {
             os.write(buffer, 0, c);
         }
         os.flush();
-        System.out.println("Lib : Sent!");
     }
 
     public void close() throws IOException {

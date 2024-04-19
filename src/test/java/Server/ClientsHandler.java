@@ -34,9 +34,13 @@ public class ClientsHandler extends SocketDataHandler {
                 }
 
                 DataHandler dh = new DataHandler();
-                dh.setTitle("/testData-" + i);
-                dh.setTimestamp(null);
-                dh.setData("Sample Body".getBytes(StandardCharsets.UTF_8));
+                try {
+                    dh.setTitle("/testData-" + i);
+                    dh.setTimestamp(null);
+                    dh.setData("Sample Body".getBytes(StandardCharsets.UTF_8));
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
 
                 try {
                     send(dh);
