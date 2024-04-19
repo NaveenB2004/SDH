@@ -19,6 +19,7 @@ public class Server {
                 System.out.println("Server started on port " + port);
 
                 while (true) {
+                    System.out.println("Server : Waiting for clients...");
                     Socket socket = serverSocket.accept();
                     System.out.println("Server : Client connected to server @  : " + socket.getRemoteSocketAddress());
                     new ClientsHandler(socket);

@@ -53,9 +53,10 @@ public class DataProcessor implements Runnable {
         int headerSize = 8 + String.valueOf(SocketDataHandler.maxBodySize).length();
         try {
             InputStream in = sdh.socket.getInputStream();
-
+            System.out.println("Lib : Receiving...");
+            byte[] buff = new byte[SocketDataHandler.ioBufferSize];
             int c;
-            while ((c = in.read()) != -1) {
+            while ((c = in.read(buff)) != -1) {
                 System.out.print(c);
             }
         } catch (IOException e) {
