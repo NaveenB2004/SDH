@@ -15,7 +15,7 @@ public class ServerHandler extends SocketDataHandler {
     }
 
     @Override
-    public void receive(@NonNull DataHandler update) throws IOException {
+    public void receive(@NonNull DataHandler update) {
         System.out.println("Update received <server>!");
         System.out.println("Title : " + update.getTitle());
         System.out.println("Timestamp : " + update.getTimestamp());

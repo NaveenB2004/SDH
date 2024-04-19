@@ -1,3 +1,4 @@
+import com.naveenb2004.SocketDataHandler;
 import lombok.SneakyThrows;
 
 public class Main {
@@ -6,6 +7,9 @@ public class Main {
 
     @SneakyThrows
     public static void main(String[] args) {
+        SocketDataHandler.ioBufferSize = 1024;
+        SocketDataHandler.maxBodySize = 5 * 1024 * 1024;
+
         new Server.Server().connect(port);
 
         Thread.sleep(3000);

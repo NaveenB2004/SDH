@@ -42,6 +42,6 @@ public abstract class SocketDataHandler implements Closeable {
         }
     }
 
-    public abstract void receive(@NonNull DataHandler update) throws IOException;
+    public abstract void receive(@NonNull DataHandler update);
 
 }
