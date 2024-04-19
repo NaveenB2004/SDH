@@ -47,6 +47,7 @@ public class DataProcessor implements Runnable {
 
     @Override
     public void run() {
+        System.out.println("triggered!");
         int headerSize = 8 + String.valueOf(SocketDataHandler.maxBodySize).length();
         try {
             InputStream in = sdh.socket.getInputStream();
@@ -57,9 +58,11 @@ public class DataProcessor implements Runnable {
                 byte[] buffer = new byte[headerSize];
                 int c;
                 while (true) {
+                    System.out.println("mark 1");
                     c = in.read(buffer);
                     baos.write(buffer, 0, c);
 
+                    System.out.println("mark 2");
                     byte[] header = baos.toByteArray();
                     if (header[0] == '{' && header[headerSize - 1] == '}') {
                         String[] headerLengths = new String(Arrays.copyOfRange(header, 1, headerSize - 2),
