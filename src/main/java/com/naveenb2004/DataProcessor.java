@@ -42,17 +42,17 @@ public class DataProcessor implements Runnable {
     }
 
     @NonNull
-    SocketDataHandler sdh;
+    private final SocketDataHandler SOCKET_DATA_HANDLER;
 
-    public DataProcessor(@NonNull SocketDataHandler sdh) {
-        this.sdh = sdh;
+    public DataProcessor(@NonNull SocketDataHandler SOCKET_DATA_HANDLER) {
+        this.SOCKET_DATA_HANDLER = SOCKET_DATA_HANDLER;
     }
 
     @Override
     public void run() {
         final int headerSize = 4 + String.valueOf(SocketDataHandler.maxBodySize).length();
         try {
-            InputStream in = sdh.socket.getInputStream();
+            InputStream in = SOCKET_DATA_HANDLER.SOCKET.getInputStream();
             while (true) {
                 // read meta buffer
                 byte[] header = new byte[headerSize];
@@ -89,7 +89,7 @@ public class DataProcessor implements Runnable {
                 dh.setTimestamp(new String(Arrays.copyOfRange(data, headerData[0], dest), StandardCharsets.UTF_8));
                 dest += headerData[2];
                 dh.setData(Arrays.copyOfRange(data, headerData[0] + headerData[1], dest));
-                sdh.receive(dh);
+                SOCKET_DATA_HANDLER.receive(dh);
             }
         } catch (Exception e) {
             throw new RuntimeException(e);

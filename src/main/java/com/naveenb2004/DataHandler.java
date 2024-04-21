@@ -11,9 +11,23 @@ import java.time.format.DateTimeParseException;
 @Getter
 @Setter
 public class DataHandler {
+    protected enum DataType {
+        TEXT("0"),
+        FILE("1"),
+        RAW_BYTES("2"),
+        OBJECT("3");
+
+        final String typeId;
+
+        DataType(String typeId) {
+            this.typeId = typeId;
+        }
+    }
+
     @NonNull
     private String title;
     private String timestamp; // LocalDateTime format (2024-04-18T07:52:30.328585500)
+    private DataType dataType;
     @NonNull
     private byte[] data;
 

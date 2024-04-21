@@ -9,19 +9,19 @@ import java.net.Socket;
 
 public abstract class SocketDataHandler implements Closeable {
     @NonNull
-    protected final Socket socket;
-    private final Thread thread = new Thread(new DataProcessor(this));
+    protected final Socket SOCKET;
+    private final Thread RECEIVER_THREAD = new Thread(new DataProcessor(this));
     public static int ioBufferSize = 1024;
     public static int maxBodySize = 5 * 1024 * 1024;
 
-    public SocketDataHandler(@NonNull final Socket socket) {
-        this.socket = socket;
-        thread.start();
+    public SocketDataHandler(@NonNull final Socket SOCKET) {
+        this.SOCKET = SOCKET;
+        RECEIVER_THREAD.start();
     }
 
     @Synchronized
     public void send(@NonNull DataHandler dataHandler) throws IOException {
-        OutputStream os = socket.getOutputStream();
+        OutputStream os = SOCKET.getOutputStream();
         byte[] buffer = new byte[ioBufferSize];
         ByteArrayInputStream data = DataProcessor.serialize(dataHandler);
 
@@ -36,11 +36,11 @@ public abstract class SocketDataHandler implements Closeable {
     }
 
     public void close() throws IOException {
-        if (thread.isAlive()) {
-            thread.interrupt();
+        if (RECEIVER_THREAD.isAlive()) {
+            RECEIVER_THREAD.interrupt();
         }
-        if (socket.isConnected()) {
-            socket.close();
+        if (SOCKET.isConnected()) {
+            SOCKET.close();
         }
     }
 
