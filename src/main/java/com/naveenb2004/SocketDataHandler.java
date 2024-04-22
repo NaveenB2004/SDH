@@ -33,17 +33,17 @@ public abstract class SocketDataHandler implements Runnable, AutoCloseable {
 
         if (dataHandler.getDataType() != DataHandler.DataType.NONE) {
             BufferedInputStream bos = null;
-            if (dataHandler.getDataType() == DataHandler.DataType.OBJECT) {
+            if (dataHandler.getDataType() == DataHandler.DataType.FILE) {
+                @Cleanup
+                FileInputStream fin = new FileInputStream(dataHandler.getFile());
+                bos = new BufferedInputStream(fin);
+            } else {
                 ByteArrayOutputStream baos = new ByteArrayOutputStream();
                 @Cleanup
                 ObjectOutputStream oos = new ObjectOutputStream(baos);
                 oos.writeObject(dataHandler.getData());
                 oos.flush();
                 bos = new BufferedInputStream(new ByteArrayInputStream(baos.toByteArray()));
-            } else if (dataHandler.getDataType() == DataHandler.DataType.FILE) {
-                @Cleanup
-                FileInputStream fin = new FileInputStream((File) dataHandler.getData());
-                bos = new BufferedInputStream(fin);
             }
 
             int c;
