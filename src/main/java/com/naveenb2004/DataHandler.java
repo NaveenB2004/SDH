@@ -18,15 +18,27 @@ public class DataHandler {
     private Serializable data;
     private File file;
 
+    @Getter
     protected enum DataType {
         NONE("0"),
         FILE("1"),
         OBJECT("2");
 
-        final String value;
+        private final String value;
 
         DataType(String value) {
             this.value = value;
+        }
+
+        static DataType getType(@NonNull String value) {
+            switch (value) {
+                case "1":
+                    return FILE;
+                case "2":
+                    return OBJECT;
+                default:
+                    return NONE;
+            }
         }
     }
 

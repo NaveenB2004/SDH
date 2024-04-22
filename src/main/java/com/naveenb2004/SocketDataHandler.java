@@ -63,7 +63,7 @@ public abstract class SocketDataHandler implements Runnable, AutoCloseable {
 
         StringBuilder header = new StringBuilder("{");
         header.append(dataHandler.getRequest().getBytes(StandardCharsets.UTF_8).length).append(",");
-        header.append(dataHandler.getDataType().value.getBytes(StandardCharsets.UTF_8).length).append(",");
+        header.append(dataHandler.getDataType().getValue()).append(",");
 
         if (dataHandler.getDataType() == DataHandler.DataType.OBJECT) {
             out = new ByteArrayOutputStream();
@@ -80,12 +80,10 @@ public abstract class SocketDataHandler implements Runnable, AutoCloseable {
             header.append("0");
         }
         header.append("}");
-        header.append(dataHandler.getRequest()).append(dataHandler.getTimestamp())
-                .append(dataHandler.getDataType().value);
+        header.append(dataHandler.getRequest()).append(dataHandler.getTimestamp());
 
         out = new ByteArrayOutputStream();
         out.write(header.toString().getBytes(StandardCharsets.UTF_8));
-
         return out.toByteArray();
     }
 
@@ -99,15 +97,21 @@ public abstract class SocketDataHandler implements Runnable, AutoCloseable {
             if (in.read() == '{') {
                 out = new ByteArrayOutputStream();
                 buff = new byte[1];
-                while (in.read(buff) != '}') {
+                while (true) {
+                    in.read(buff);
+
+                    if (new String(buff, StandardCharsets.UTF_8).equals("}")) {
+                        break;
+                    }
+
                     out.write(buff);
                 }
 
                 String[] headers = out.toString(StandardCharsets.UTF_8).split(",");
                 int requestLen = Integer.parseInt(headers[0]);
                 int timestampLen = 13;
-                String dataTypeVal = headers[2];
-                int dataLen = Integer.parseInt(headers[3]);
+                String dataTypeVal = headers[1];
+                int dataLen = Integer.parseInt(headers[2]);
 
                 buff = new byte[requestLen];
                 in.read(buff);
@@ -117,8 +121,8 @@ public abstract class SocketDataHandler implements Runnable, AutoCloseable {
                 in.read(buff);
                 long timestamp = Long.parseLong(new String(buff, StandardCharsets.UTF_8));
 
-                DataHandler dh = null;
-                DataHandler.DataType dataType = DataHandler.DataType.valueOf(dataTypeVal);
+                DataHandler dh;
+                DataHandler.DataType dataType = DataHandler.DataType.getType(dataTypeVal);
                 out = new ByteArrayOutputStream();
                 if (dataType == DataHandler.DataType.OBJECT) {
                     buff = new byte[defaultBufferSize];
