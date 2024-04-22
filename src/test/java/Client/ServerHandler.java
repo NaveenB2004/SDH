@@ -18,7 +18,7 @@ public class ServerHandler extends SocketDataHandler {
     public void receive(@NonNull DataHandler update) {
         System.out.println("Update received <server>!");
         System.out.println("Title : " + update.getTitle());
-        System.out.println("Timestamp : " + update.getTimestamp());
+        System.out.println("Timestamp : " + update.timestamp());
         System.out.println("Data : " + new String(update.getData(), StandardCharsets.UTF_8));
         System.out.println();
     }

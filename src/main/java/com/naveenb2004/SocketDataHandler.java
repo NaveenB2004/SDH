@@ -5,8 +5,6 @@ import lombok.*;
 import java.io.*;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
-import java.text.DecimalFormat;
-import java.util.Arrays;
 
 @RequiredArgsConstructor
 public abstract class SocketDataHandler implements Runnable, AutoCloseable {
@@ -18,7 +16,7 @@ public abstract class SocketDataHandler implements Runnable, AutoCloseable {
     private static int defaultBufferSize = 1024;
     @Getter
     @Setter
-    private static int maxDataSize = 5 * 1024 * 1024;
+    private static int maxDataChunk = 5 * 1024 * 1024;
 
     public abstract void receive(@NonNull DataHandler update);
 
@@ -26,92 +24,83 @@ public abstract class SocketDataHandler implements Runnable, AutoCloseable {
     public void send(@NonNull DataHandler dataHandler) throws IOException {
         OutputStream os = SOCKET.getOutputStream();
         byte[] buffer = new byte[defaultBufferSize];
-        ByteArrayInputStream data = serialize(dataHandler);
+        byte[] data = serialize(dataHandler);
 
-        @Cleanup
-        BufferedInputStream bos = new BufferedInputStream(data);
-
-        int c;
-        while ((c = bos.read(buffer)) != -1) {
-            os.write(buffer, 0, c);
-        }
+        os.write(data);
         os.flush();
+
+        if (dataHandler.getDataType() != DataHandler.DataType.NONE) {
+            BufferedInputStream bos = null;
+            if (dataHandler.getDataType() == DataHandler.DataType.OBJECT) {
+                ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                @Cleanup
+                ObjectOutputStream oos = new ObjectOutputStream(baos);
+                oos.writeObject(dataHandler.getData());
+                oos.flush();
+                bos = new BufferedInputStream(new ByteArrayInputStream(baos.toByteArray()));
+            } else if (dataHandler.getDataType() == DataHandler.DataType.FILE) {
+                @Cleanup
+                FileInputStream fin = new FileInputStream((File) dataHandler.getData());
+                bos = new BufferedInputStream(fin);
+            }
+
+            int c;
+            while ((c = bos.read(buffer)) != -1) {
+                os.write(buffer, 0, c);
+            }
+            os.flush();
+            bos.close();
+        }
     }
 
-    private static final DecimalFormat TITLE = new DecimalFormat("00");
-    private static final DecimalFormat TIMESTAMP = new DecimalFormat("00");
-    private static final DecimalFormat DATA
-            = new DecimalFormat("0".repeat(String.valueOf(SocketDataHandler.maxDataSize).length()));
-
     @NonNull
-    protected static ByteArrayInputStream serialize(@NonNull DataHandler dataHandler) throws IOException {
-        byte[] titleBytes = dataHandler.getTitle().getBytes(StandardCharsets.UTF_8);
-        byte[] timestampBytes = dataHandler.getTimestamp().getBytes(StandardCharsets.UTF_8);
-        byte[] dataBytes = dataHandler.getData();
+    protected static byte[] serialize(@NonNull DataHandler dataHandler) throws IOException {
+        ByteArrayOutputStream out;
 
-        String header = String.format("%s%s%s",
-                TITLE.format(titleBytes.length),
-                TIMESTAMP.format(timestampBytes.length),
-                DATA.format(dataBytes.length));
+        dataHandler.setTimestamp(DataHandler.timestamp());
 
-        @Cleanup
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        baos.write(header.getBytes(StandardCharsets.UTF_8));
-        baos.write(titleBytes);
-        baos.write(timestampBytes);
-        baos.write(dataBytes);
+        StringBuilder header = new StringBuilder("{");
+        header.append(dataHandler.getRequest().getBytes(StandardCharsets.UTF_8).length).append(",");
+        header.append(dataHandler.getTimestamp().getBytes(StandardCharsets.UTF_8).length).append(",");
+        header.append(dataHandler.getDataType().value.getBytes(StandardCharsets.UTF_8).length).append(",");
 
-        @Cleanup
-        ByteArrayInputStream bain = new ByteArrayInputStream(baos.toByteArray());
+        if (dataHandler.getDataType() == DataHandler.DataType.NONE) {
+            header.append("0");
+        } else if (dataHandler.getDataType() == DataHandler.DataType.OBJECT) {
+            out = new ByteArrayOutputStream();
+            @Cleanup
+            ObjectOutputStream oOut = new ObjectOutputStream(out);
+            oOut.writeObject(dataHandler.getData());
+            oOut.flush();
+            header.append(out.toByteArray().length);
+        } else if (dataHandler.getDataType() == DataHandler.DataType.FILE) {
+            header.append(((File) dataHandler.getData()).length());
+        }
+        header.append("}");
+        header.append(dataHandler.getRequest()).append(dataHandler.getTimestamp())
+                .append(dataHandler.getDataType().value);
 
-        return bain;
+        out = new ByteArrayOutputStream();
+        out.write(header.toString().getBytes(StandardCharsets.UTF_8));
+
+        return out.toByteArray();
     }
 
     @Override
     public void run() {
-        final int headerSize = 4 + String.valueOf(SocketDataHandler.maxDataSize).length();
         try {
             InputStream in = SOCKET.getInputStream();
             while (true) {
-                // read meta buffer
-                byte[] header = new byte[headerSize];
-                in.read(header);
-
-                int[] headerData = {
-                        Integer.parseInt(new String(Arrays.copyOfRange(header, 0, 2), StandardCharsets.UTF_8)),
-                        Integer.parseInt(new String(Arrays.copyOfRange(header, 2, 4), StandardCharsets.UTF_8)),
-                        Integer.parseInt(new String(Arrays.copyOfRange(header, 4, headerSize), StandardCharsets.UTF_8))
-                };
-
-                int bodySize = headerData[0] + headerData[1] + headerData[2];
-                ByteArrayOutputStream out = new ByteArrayOutputStream();
-                byte[] buffer = new byte[SocketDataHandler.defaultBufferSize];
-                while (bodySize > 0) {
-                    int c;
-                    if (bodySize >= SocketDataHandler.defaultBufferSize) {
-                        c = in.read(buffer);
-                        out.write(buffer, 0, c);
-                        bodySize -= SocketDataHandler.defaultBufferSize;
-                    } else {
-                        byte[] finBuff = new byte[bodySize];
-                        c = in.read(finBuff);
-                        out.write(finBuff, 0, c);
-                        bodySize = 0;
+                if (in.read() == '{') {
+                    ByteArrayOutputStream out = new ByteArrayOutputStream();
+                    byte[] b = new byte[1];
+                    while (in.read(b) != '}') {
+                        out.write(b);
                     }
-                }
 
-                byte[] data = out.toByteArray();
-                int dest = headerData[0];
-                String title = new String(Arrays.copyOfRange(data, 0, dest), StandardCharsets.UTF_8);
-                dest += headerData[1];
-                String timestamp = new String(Arrays.copyOfRange(data, headerData[0], dest), StandardCharsets.UTF_8);
-                dest += headerData[2];
-                byte[] body = Arrays.copyOfRange(data, headerData[0] + headerData[1], dest);
-                receive(DataHandler.builder()
-                        .title(title)
-                        .dataType(DataHandler.DataType.RAW_BYTES)
-                        .data(data)
-                        .build());
+                    String[] headers = out.toString(StandardCharsets.UTF_8).split(",");
+
+                }
             }
         } catch (Exception e) {
             throw new RuntimeException(e);

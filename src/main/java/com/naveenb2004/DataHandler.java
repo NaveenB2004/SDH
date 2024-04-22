@@ -1,62 +1,37 @@
 package com.naveenb2004;
 
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NonNull;
+import lombok.*;
+
+import java.io.Serializable;
 
 @Getter
-@AllArgsConstructor(access = AccessLevel.PRIVATE)
+@Setter
+@RequiredArgsConstructor
 public class DataHandler {
+    @NonNull
+    private final String request;
+    @Setter(AccessLevel.PROTECTED)
+    private String timestamp;
+    private DataType dataType = DataType.NONE;
+    private Serializable data;
+
     public enum DataType {
-        NULL("0"),
-        TEXT("1"),
-        FILE("2"),
-        RAW_BYTES("3"),
-        OBJECT("4");
+        NONE("0"),
+        FILE("1"),
+        OBJECT("2");
 
-        final String typeId;
+        final String value;
 
-        DataType(String typeId) {
-            this.typeId = typeId;
+        DataType(String value) {
+            this.value = value;
         }
     }
 
-    @NonNull
-    private String title;
-    @NonNull
-    private String timestamp; // LocalDateTime format (2024-04-18T07:52:30.328585500)
-    @NonNull
-    private DataType dataType;
-    private byte[] data;
-
-    public static DataHandlerBuilder builder() {
-        return new DataHandlerBuilder();
+    public void setDataType(@NonNull DataType dataType) {
+        this.dataType = dataType;
     }
 
-    public static class DataHandlerBuilder {
-        private String title;
-        private DataType dataType;
-        private byte[] data;
-
-        public DataHandlerBuilder title(String title) {
-            this.title = title;
-            return this;
-        }
-
-        public DataHandlerBuilder dataType(DataType dataType) {
-            this.dataType = dataType;
-            return this;
-        }
-
-        public DataHandlerBuilder data(byte[] data) {
-            this.data = data;
-            return this;
-        }
-
-        public DataHandler build() {
-            String timestamp = "";
-            return new DataHandler(title, timestamp, dataType, data);
-        }
+    protected static String timestamp() {
+        return null;
     }
 }
