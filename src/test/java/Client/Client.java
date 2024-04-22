@@ -7,8 +7,14 @@ public class Client {
     public void connect(int port) {
         try {
             Socket socket = new Socket("localhost", port);
-            System.out.println("Client : Connected to server @ " + socket.getRemoteSocketAddress());
-            new ServerHandler(socket);
+            System.out.println("Client : Connected to server on " + socket.getRemoteSocketAddress());
+
+            ClientHelper clientHelper = new ClientHelper(socket);
+
+            Thread clientThread = new Thread(clientHelper);
+            clientThread.start();
+
+            clientHelper.sendFirstMessage();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
