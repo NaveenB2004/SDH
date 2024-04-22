@@ -1,24 +1,24 @@
 package com.naveenb2004;
 
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NonNull;
+import lombok.Setter;
 
 import java.io.File;
 import java.io.Serializable;
 
 @Getter
-@Setter
-@RequiredArgsConstructor
 public class DataHandler {
-    @NonNull
     private final String request;
     @Setter(AccessLevel.PROTECTED)
     private long timestamp;
-    @NonNull
+    @Setter(AccessLevel.PROTECTED)
     private DataType dataType;
     private Serializable data;
-    private File dataLocation;
+    private File file;
 
-    public enum DataType {
+    protected enum DataType {
         NONE("0"),
         FILE("1"),
         OBJECT("2");
@@ -30,21 +30,26 @@ public class DataHandler {
         }
     }
 
-    public void setData(Serializable data) {
-        if (this.dataType != DataType.OBJECT) {
-            throw new IllegalArgumentException("Invalid data type");
-        }
+    public DataHandler(@NonNull String request) {
+        this.request = request;
+        this.dataType = DataType.NONE;
+    }
+
+    public DataHandler(@NonNull String request,
+                       @NonNull Serializable data) {
+        this.request = request;
+        this.dataType = DataType.OBJECT;
         this.data = data;
     }
 
-    public void setDataLocation(@NonNull File dataLocation) {
-        if (this.dataType != DataType.FILE) {
-            throw new IllegalArgumentException("Invalid data type");
-        }
-        if (!dataLocation.isFile()) {
+    public DataHandler(@NonNull String request,
+                       @NonNull File file) {
+        if (!file.isFile()) {
             throw new IllegalArgumentException("Invalid data location");
         }
-        this.dataLocation = dataLocation;
+        this.request = request;
+        this.dataType = DataType.FILE;
+        this.file = file;
     }
 
     protected static long timestamp() {

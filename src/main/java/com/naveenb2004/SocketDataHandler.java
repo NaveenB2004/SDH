@@ -65,9 +65,7 @@ public abstract class SocketDataHandler implements Runnable, AutoCloseable {
         header.append(dataHandler.getRequest().getBytes(StandardCharsets.UTF_8).length).append(",");
         header.append(dataHandler.getDataType().value.getBytes(StandardCharsets.UTF_8).length).append(",");
 
-        if (dataHandler.getDataType() == DataHandler.DataType.NONE) {
-            header.append("0");
-        } else if (dataHandler.getDataType() == DataHandler.DataType.OBJECT) {
+        if (dataHandler.getDataType() == DataHandler.DataType.OBJECT) {
             out = new ByteArrayOutputStream();
             @Cleanup
             ObjectOutputStream oOut = new ObjectOutputStream(out);
@@ -75,9 +73,11 @@ public abstract class SocketDataHandler implements Runnable, AutoCloseable {
             oOut.flush();
             header.append(out.toByteArray().length);
         } else if (dataHandler.getDataType() == DataHandler.DataType.FILE) {
-            File file = (File) dataHandler.getData();
+            File file = dataHandler.getFile();
             String suffix = file.getName().substring(file.getName().lastIndexOf(".") + 1);
             header.append(suffix).append("$").append(file.length());
+        } else {
+            header.append("0");
         }
         header.append("}");
         header.append(dataHandler.getRequest()).append(dataHandler.getTimestamp())
@@ -117,11 +117,8 @@ public abstract class SocketDataHandler implements Runnable, AutoCloseable {
                 in.read(buff);
                 long timestamp = Long.parseLong(new String(buff, StandardCharsets.UTF_8));
 
+                DataHandler dh = null;
                 DataHandler.DataType dataType = DataHandler.DataType.valueOf(dataTypeVal);
-
-                DataHandler dh = new DataHandler(request, dataType);
-                dh.setTimestamp(timestamp);
-
                 out = new ByteArrayOutputStream();
                 if (dataType == DataHandler.DataType.OBJECT) {
                     buff = new byte[defaultBufferSize];
@@ -137,7 +134,7 @@ public abstract class SocketDataHandler implements Runnable, AutoCloseable {
                         }
                         dataLen -= defaultBufferSize;
                     }
-                    dh.setData(out.toByteArray());
+                    dh = new DataHandler(request, out.toByteArray());
                 } else if (dataType == DataHandler.DataType.FILE) {
                     buff = new byte[1];
                     while (in.read(buff) != '$') {
@@ -162,8 +159,13 @@ public abstract class SocketDataHandler implements Runnable, AutoCloseable {
                         }
                         dataLen -= defaultBufferSize;
                     }
-                    dh.setDataLocation(tempFile.toFile());
+                    dh = new DataHandler(request, tempFile.toFile());
+                } else {
+                    dh = new DataHandler(request);
                 }
+
+                dh.setDataType(dataType);
+                dh.setTimestamp(timestamp);
 
                 receive(dh);
             }
