@@ -32,8 +32,8 @@ public abstract class SocketDataHandler implements Runnable, AutoCloseable {
         os.flush();
 
         if (dataHandler.getDataType() != DataHandler.DataType.NONE) {
-            BufferedInputStream bos;
             FileInputStream fin = null;
+            BufferedInputStream bos;
             if (dataHandler.getDataType() == DataHandler.DataType.FILE) {
                 fin = new FileInputStream(dataHandler.getFile());
                 bos = new BufferedInputStream(fin);
@@ -147,16 +147,24 @@ public abstract class SocketDataHandler implements Runnable, AutoCloseable {
                     dh = new DataHandler(request, out.toByteArray());
                 } else if (dataType == DataHandler.DataType.FILE) {
                     buff = new byte[1];
-                    while (in.read(buff) != '$') {
+                    while (true) {
+                        in.read(buff);
+
+                        if (new String(buff, StandardCharsets.UTF_8).equals("$")) {
+                            break;
+                        }
+
                         out.write(buff);
                     }
 
+                    if (!tempFolder.exists()) {
+                        tempFolder.mkdirs();
+                    }
                     Path tempFile = Files.createTempFile(tempFolder.toPath(), null,
-                            out.toString(StandardCharsets.UTF_8));
-                    @Cleanup
-                    FileOutputStream fos = new FileOutputStream(tempFolder);
-                    @Cleanup
+                            "." + out.toString(StandardCharsets.UTF_8));
+                    FileOutputStream fos = new FileOutputStream(tempFile.toFile());
                     BufferedOutputStream bos = new BufferedOutputStream(fos);
+                    buff = new byte[defaultBufferSize];
                     while (true) {
                         if (dataLen <= defaultBufferSize) {
                             buff = new byte[dataLen];
@@ -169,6 +177,8 @@ public abstract class SocketDataHandler implements Runnable, AutoCloseable {
                         }
                         dataLen -= defaultBufferSize;
                     }
+                    bos.close();
+                    fos.close();
                     dh = new DataHandler(request, tempFile.toFile());
                 } else {
                     dh = new DataHandler(request);
