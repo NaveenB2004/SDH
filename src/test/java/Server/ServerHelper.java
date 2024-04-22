@@ -1,9 +1,11 @@
 package Server;
 
+import Common.SampleObject;
 import com.naveenb2004.DataHandler;
 import com.naveenb2004.SocketDataHandler;
 import lombok.NonNull;
 
+import java.awt.*;
 import java.io.IOException;
 import java.net.Socket;
 
@@ -19,19 +21,22 @@ public class ServerHelper extends SocketDataHandler {
         System.out.println("Server : Request = " + update.getRequest());
         System.out.println("Server : Timestamp = " + update.getTimestamp());
         System.out.println("Server : DataType = " + update.getDataType());
-        System.out.println();
 
-        if (update.getRequest().equals("/FirstMessage")) {
-            System.out.println("Server : FirstMessage received!");
-            System.out.println("Server : Replying to first message...");
-            DataHandler dataHandler = new DataHandler("/ReplyToFirstMessage");
+        if (update.getDataType() == DataHandler.DataType.FILE) {
             try {
-                send(dataHandler);
-                System.out.println("Server : Reply sent!");
+                Desktop.getDesktop().open(update.getFile());
+                System.out.println("Server : File opened!");
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
-            System.out.println();
         }
+
+        if (update.getDataType() == DataHandler.DataType.OBJECT) {
+            SampleObject object = (SampleObject) update.getData();
+            System.out.println("Server : Object received!");
+            System.out.println("Server : Object Details = " + object.toString());
+        }
+
+        System.out.println();
     }
 }

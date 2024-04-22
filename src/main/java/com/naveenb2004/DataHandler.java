@@ -19,7 +19,7 @@ public class DataHandler {
     private File file;
 
     @Getter
-    protected enum DataType {
+    public enum DataType {
         NONE("0"),
         FILE("1"),
         OBJECT("2");

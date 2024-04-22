@@ -1,9 +1,11 @@
 package Client;
 
+import Common.SampleObject;
 import com.naveenb2004.DataHandler;
 import com.naveenb2004.SocketDataHandler;
 import lombok.NonNull;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.Socket;
 
@@ -22,12 +24,43 @@ public class ClientHelper extends SocketDataHandler {
         System.out.println();
     }
 
-    protected void sendFirstMessage() {
-        System.out.println("Client : Sending first message...");
-        DataHandler dataHandler = new DataHandler("/FirstMessage");
+    protected void sendText() {
+        System.out.println("Client : Sending Text...");
+        DataHandler dataHandler = new DataHandler("/SendText");
         try {
             send(dataHandler);
             System.out.println("Client : Message sent!");
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        System.out.println();
+    }
+
+    protected void sendFile() {
+        System.out.println("Client : Sending File...");
+        File file = new File("src/test/java/Common/SampleFile.jpg");
+        DataHandler dataHandler = new DataHandler("/SendFile", file);
+        try {
+            send(dataHandler);
+            System.out.println("Client : File sent!");
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        System.out.println();
+    }
+
+    protected void sendObject() {
+        System.out.println("Client : Sending Object...");
+        SampleObject object = SampleObject.builder()
+                .id(123456L)
+                .name("SampleObjectName")
+                .age(80)
+                .isMale(true)
+                .build();
+        DataHandler dataHandler = new DataHandler("/SendObject", object);
+        try {
+            send(dataHandler);
+            System.out.println("Client : Object sent!");
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

@@ -32,10 +32,10 @@ public abstract class SocketDataHandler implements Runnable, AutoCloseable {
         os.flush();
 
         if (dataHandler.getDataType() != DataHandler.DataType.NONE) {
-            BufferedInputStream bos = null;
+            BufferedInputStream bos;
+            FileInputStream fin = null;
             if (dataHandler.getDataType() == DataHandler.DataType.FILE) {
-                @Cleanup
-                FileInputStream fin = new FileInputStream(dataHandler.getFile());
+                fin = new FileInputStream(dataHandler.getFile());
                 bos = new BufferedInputStream(fin);
             } else {
                 ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -52,6 +52,10 @@ public abstract class SocketDataHandler implements Runnable, AutoCloseable {
             }
             os.flush();
             bos.close();
+
+            if (fin != null) {
+                fin.close();
+            }
         }
     }
 
@@ -65,6 +69,7 @@ public abstract class SocketDataHandler implements Runnable, AutoCloseable {
         header.append(dataHandler.getRequest().getBytes(StandardCharsets.UTF_8).length).append(",");
         header.append(dataHandler.getDataType().getValue()).append(",");
 
+        String suffix = "";
         if (dataHandler.getDataType() == DataHandler.DataType.OBJECT) {
             out = new ByteArrayOutputStream();
             @Cleanup
@@ -74,13 +79,14 @@ public abstract class SocketDataHandler implements Runnable, AutoCloseable {
             header.append(out.toByteArray().length);
         } else if (dataHandler.getDataType() == DataHandler.DataType.FILE) {
             File file = dataHandler.getFile();
-            String suffix = file.getName().substring(file.getName().lastIndexOf(".") + 1);
-            header.append(suffix).append("$").append(file.length());
+            suffix = file.getName().substring(file.getName().lastIndexOf(".") + 1) + "$";
+            header.append(file.length());
         } else {
             header.append("0");
         }
         header.append("}");
         header.append(dataHandler.getRequest()).append(dataHandler.getTimestamp());
+        header.append(suffix);
 
         out = new ByteArrayOutputStream();
         out.write(header.toString().getBytes(StandardCharsets.UTF_8));

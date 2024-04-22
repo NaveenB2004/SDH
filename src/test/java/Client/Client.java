@@ -14,8 +14,18 @@ public class Client {
             Thread clientThread = new Thread(clientHelper);
             clientThread.start();
 
-            clientHelper.sendFirstMessage();
-        } catch (IOException e) {
+            clientHelper.sendText();
+            Thread.sleep(3000);
+
+            clientHelper.sendFile();
+            Thread.sleep(3000);
+
+            clientHelper.sendObject();
+            Thread.sleep(3000);
+
+            clientHelper.close();
+            System.out.println("Client : Disconnected from server " + socket.getRemoteSocketAddress());
+        } catch (IOException | InterruptedException e) {
             throw new RuntimeException(e);
         }
     }
