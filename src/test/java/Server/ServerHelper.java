@@ -33,7 +33,6 @@ public class ServerHelper extends SocketDataHandler {
 
         if (update.getDataType() == DataHandler.DataType.OBJECT) {
             SampleObject object = (SampleObject) update.getData();
-            System.out.println("Server : Object received!");
             System.out.println("Server : Object Details = " + object.toString());
         }
 

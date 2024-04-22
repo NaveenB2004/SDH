@@ -144,7 +144,12 @@ public abstract class SocketDataHandler implements Runnable, AutoCloseable {
                         }
                         dataLen -= defaultBufferSize;
                     }
-                    dh = new DataHandler(request, out.toByteArray());
+                    @Cleanup
+                    ByteArrayInputStream bais = new ByteArrayInputStream(out.toByteArray());
+                    @Cleanup
+                    ObjectInputStream ois = new ObjectInputStream(bais);
+
+                    dh = new DataHandler(request, (Serializable) ois.readObject());
                 } else if (dataType == DataHandler.DataType.FILE) {
                     buff = new byte[1];
                     while (true) {
