@@ -48,6 +48,6 @@ public class DataHandler {
     }
 
     protected static long timestamp() {
-        return 0L;
+        return System.currentTimeMillis();
     }
 }

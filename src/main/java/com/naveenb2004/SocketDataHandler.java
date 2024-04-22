@@ -105,7 +105,7 @@ public abstract class SocketDataHandler implements Runnable, AutoCloseable {
 
                 String[] headers = out.toString(StandardCharsets.UTF_8).split(",");
                 int requestLen = Integer.parseInt(headers[0]);
-                int timestampLen = 5;
+                int timestampLen = 13;
                 String dataTypeVal = headers[2];
                 int dataLen = Integer.parseInt(headers[3]);
 
