@@ -11,18 +11,25 @@ public abstract class SocketDataHandler implements Runnable, AutoCloseable {
     @NonNull
     private final Socket SOCKET;
     @Getter
-    @Setter
-    protected static int defaultBufferSize = 1024;
+    protected static long defaultBufferSize = 1024L;
     @Getter
     @Setter
+    @NonNull
     protected static File tempFolder = new File("Temp");
+
+    public static void setDefaultBufferSize(long defaultBufferSize) {
+        if (defaultBufferSize <= 0) {
+            throw new IllegalArgumentException("Default buffer size must be greater than 0 bytes!");
+        }
+        SocketDataHandler.defaultBufferSize = defaultBufferSize;
+    }
 
     public abstract void receive(@NonNull DataHandler update);
 
     @Synchronized
     public void send(@NonNull DataHandler dataHandler) throws IOException {
         OutputStream os = SOCKET.getOutputStream();
-        byte[] buffer = new byte[defaultBufferSize];
+        byte[] buffer = new byte[Math.toIntExact(defaultBufferSize)];
         byte[] data = DataProcessor.serialize(dataHandler);
 
         os.write(data);

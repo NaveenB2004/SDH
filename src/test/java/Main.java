@@ -9,7 +9,7 @@ public class Main {
 
     @SneakyThrows
     public static void main(String[] args) {
-        SocketDataHandler.setDefaultBufferSize(1024);
+        SocketDataHandler.setDefaultBufferSize(1024L);
         SocketDataHandler.setTempFolder(new File("Temp"));
 
         new Server.Server().connect(port);

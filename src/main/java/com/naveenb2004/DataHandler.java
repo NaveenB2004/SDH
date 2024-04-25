@@ -17,6 +17,10 @@ public class DataHandler {
     private DataType dataType;
     private Serializable data;
     private File file;
+    @Setter(AccessLevel.PROTECTED)
+    private long totalDataSize;
+    @Setter(AccessLevel.PROTECTED)
+    private long receivedDataSize;
 
     @Getter
     public enum DataType {

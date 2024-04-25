@@ -66,7 +66,7 @@ public class DataProcessor {
                 int requestLen = Integer.parseInt(headers[0]);
                 int timestampLen = 13;
                 String dataTypeVal = headers[1];
-                int dataLen = Integer.parseInt(headers[2]);
+                long dataLen = Long.parseLong(headers[2]);
 
                 buff = new byte[requestLen];
                 in.read(buff);
@@ -80,10 +80,10 @@ public class DataProcessor {
                 DataHandler.DataType dataType = DataHandler.DataType.getType(dataTypeVal);
                 out = new ByteArrayOutputStream();
                 if (dataType == DataHandler.DataType.OBJECT) {
-                    buff = new byte[SocketDataHandler.defaultBufferSize];
+                    buff = new byte[Math.toIntExact(SocketDataHandler.defaultBufferSize)];
                     while (true) {
                         if (dataLen <= SocketDataHandler.defaultBufferSize) {
-                            buff = new byte[dataLen];
+                            buff = new byte[Math.toIntExact(dataLen)];
                             in.read(buff);
                             out.write(buff);
                             break;
@@ -118,10 +118,10 @@ public class DataProcessor {
                             "." + out.toString(StandardCharsets.UTF_8));
                     FileOutputStream fos = new FileOutputStream(tempFile.toFile());
                     BufferedOutputStream bos = new BufferedOutputStream(fos);
-                    buff = new byte[SocketDataHandler.defaultBufferSize];
+                    buff = new byte[Math.toIntExact(SocketDataHandler.defaultBufferSize)];
                     while (true) {
                         if (dataLen <= SocketDataHandler.defaultBufferSize) {
-                            buff = new byte[dataLen];
+                            buff = new byte[Math.toIntExact(dataLen)];
                             in.read(buff);
                             bos.write(buff);
                             break;
