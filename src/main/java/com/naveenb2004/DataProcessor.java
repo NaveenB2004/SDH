@@ -26,13 +26,18 @@ public class DataProcessor {
             ObjectOutputStream oOut = new ObjectOutputStream(out);
             oOut.writeObject(dataHandler.getData());
             oOut.flush();
-            header.append(out.toByteArray().length);
+            long length = out.toByteArray().length;
+            header.append(length);
+            dataHandler.setTotalDataSize(length);
         } else if (dataHandler.getDataType() == DataHandler.DataType.FILE) {
             File file = dataHandler.getFile();
             suffix = file.getName().substring(file.getName().lastIndexOf(".") + 1) + "$";
-            header.append(file.length());
+            long length = file.length();
+            header.append(length);
+            dataHandler.setTotalDataSize(length);
         } else {
             header.append("0");
+            dataHandler.setTotalDataSize(0L);
         }
         header.append("}");
         header.append(dataHandler.getRequest()).append(dataHandler.getTimestamp());
@@ -50,6 +55,9 @@ public class DataProcessor {
         byte[] buff;
         while (true) {
             if (in.read() == '{') {
+                long defaultBufferSize = SocketDataHandler.defaultBufferSize;
+                File tempFolder = SocketDataHandler.tempFolder;
+
                 out = new ByteArrayOutputStream();
                 buff = new byte[1];
                 while (true) {
@@ -79,10 +87,11 @@ public class DataProcessor {
                 DataHandler dh;
                 DataHandler.DataType dataType = DataHandler.DataType.getType(dataTypeVal);
                 out = new ByteArrayOutputStream();
+
                 if (dataType == DataHandler.DataType.OBJECT) {
-                    buff = new byte[Math.toIntExact(SocketDataHandler.defaultBufferSize)];
+                    buff = new byte[Math.toIntExact(defaultBufferSize)];
                     while (true) {
-                        if (dataLen <= SocketDataHandler.defaultBufferSize) {
+                        if (dataLen <= defaultBufferSize) {
                             buff = new byte[Math.toIntExact(dataLen)];
                             in.read(buff);
                             out.write(buff);
@@ -91,7 +100,7 @@ public class DataProcessor {
                             in.read(buff);
                             out.write(buff);
                         }
-                        dataLen -= SocketDataHandler.defaultBufferSize;
+                        dataLen -= defaultBufferSize;
                     }
                     @Cleanup
                     ByteArrayInputStream bais = new ByteArrayInputStream(out.toByteArray());
@@ -111,16 +120,16 @@ public class DataProcessor {
                         out.write(buff);
                     }
 
-                    if (!SocketDataHandler.tempFolder.exists()) {
-                        SocketDataHandler.tempFolder.mkdirs();
+                    if (!tempFolder.exists()) {
+                        tempFolder.mkdirs();
                     }
-                    Path tempFile = Files.createTempFile(SocketDataHandler.tempFolder.toPath(), null,
+                    Path tempFile = Files.createTempFile(tempFolder.toPath(), null,
                             "." + out.toString(StandardCharsets.UTF_8));
                     FileOutputStream fos = new FileOutputStream(tempFile.toFile());
                     BufferedOutputStream bos = new BufferedOutputStream(fos);
-                    buff = new byte[Math.toIntExact(SocketDataHandler.defaultBufferSize)];
+                    buff = new byte[Math.toIntExact(defaultBufferSize)];
                     while (true) {
-                        if (dataLen <= SocketDataHandler.defaultBufferSize) {
+                        if (dataLen <= defaultBufferSize) {
                             buff = new byte[Math.toIntExact(dataLen)];
                             in.read(buff);
                             bos.write(buff);
@@ -129,7 +138,7 @@ public class DataProcessor {
                             in.read(buff);
                             bos.write(buff);
                         }
-                        dataLen -= SocketDataHandler.defaultBufferSize;
+                        dataLen -= defaultBufferSize;
                     }
                     bos.close();
                     fos.close();

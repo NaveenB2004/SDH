@@ -20,7 +20,7 @@ public class DataHandler {
     @Setter(AccessLevel.PROTECTED)
     private long totalDataSize;
     @Setter(AccessLevel.PROTECTED)
-    private long receivedDataSize;
+    private long transferredDataSize;
 
     @Getter
     public enum DataType {
@@ -61,7 +61,7 @@ public class DataHandler {
     public DataHandler(@NonNull String request,
                        @NonNull File file) {
         if (!file.isFile()) {
-            throw new IllegalArgumentException("Invalid data location");
+            throw new IllegalArgumentException("Invalid file!");
         }
         this.request = request;
         this.dataType = DataType.FILE;
