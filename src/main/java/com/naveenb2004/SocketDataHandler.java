@@ -5,8 +5,7 @@ import lombok.*;
 import java.io.*;
 import java.net.Socket;
 
-@RequiredArgsConstructor
-public abstract class SocketDataHandler implements Runnable, AutoCloseable {
+public abstract class SocketDataHandler implements AutoCloseable {
     @Getter
     @NonNull
     private final Socket SOCKET;
@@ -17,14 +16,17 @@ public abstract class SocketDataHandler implements Runnable, AutoCloseable {
     @NonNull
     protected static File tempFolder = new File("Temp");
 
+    public SocketDataHandler(@NonNull final Socket SOCKET) {
+        this.SOCKET = SOCKET;
+        new Thread(new DataProcessor(this)).start();
+    }
+
     public static void setDefaultBufferSize(long defaultBufferSize) {
         if (defaultBufferSize <= 0) {
             throw new IllegalArgumentException("Default buffer size must be greater than 0 bytes!");
         }
         SocketDataHandler.defaultBufferSize = defaultBufferSize;
     }
-
-    public abstract void receive(@NonNull DataHandler update);
 
     @Synchronized
     public void send(@NonNull DataHandler dataHandler) throws IOException {
@@ -66,11 +68,7 @@ public abstract class SocketDataHandler implements Runnable, AutoCloseable {
         }
     }
 
-    @SneakyThrows
-    @Override
-    public void run() {
-        new DataProcessor().deserialize(this);
-    }
+    public abstract void receive(@NonNull DataHandler update);
 
     public void close() throws IOException {
         if (SOCKET.isConnected()) {

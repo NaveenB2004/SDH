@@ -2,13 +2,14 @@ package com.naveenb2004;
 
 import lombok.Cleanup;
 import lombok.NonNull;
+import lombok.SneakyThrows;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-public class DataProcessor {
+public class DataProcessor implements Runnable {
     @NonNull
     protected static byte[] serialize(@NonNull DataHandler dataHandler) throws IOException {
         ByteArrayOutputStream out;
@@ -48,8 +49,16 @@ public class DataProcessor {
         return out.toByteArray();
     }
 
-    protected void deserialize(@NonNull SocketDataHandler socketDataHandler)
-            throws IOException, ClassNotFoundException {
+    @NonNull
+    final SocketDataHandler socketDataHandler;
+
+    public DataProcessor(@NonNull final SocketDataHandler socketDataHandler) {
+        this.socketDataHandler = socketDataHandler;
+    }
+
+    @SneakyThrows
+    @Override
+    public void run() {
         InputStream in = socketDataHandler.getSOCKET().getInputStream();
         ByteArrayOutputStream out;
         byte[] buff;
@@ -84,21 +93,34 @@ public class DataProcessor {
                 in.read(buff);
                 long timestamp = Long.parseLong(new String(buff, StandardCharsets.UTF_8));
 
-                DataHandler dh;
+                DataHandler dh = new DataHandler(request);
                 DataHandler.DataType dataType = DataHandler.DataType.getType(dataTypeVal);
+
+                dh.setDataType(dataType);
+                dh.setTimestamp(timestamp);
+                dh.setTotalDataSize(dataLen);
+
+                new Thread(() -> socketDataHandler.receive(dh),
+                        "SocketDataHandler : Handle request = " + request).start();
+
                 out = new ByteArrayOutputStream();
 
+                long i = 0L;
                 if (dataType == DataHandler.DataType.OBJECT) {
                     buff = new byte[Math.toIntExact(defaultBufferSize)];
                     while (true) {
                         if (dataLen <= defaultBufferSize) {
                             buff = new byte[Math.toIntExact(dataLen)];
-                            in.read(buff);
-                            out.write(buff);
+                            int c = in.read(buff);
+                            out.write(buff, 0, c);
+                            i += c;
+                            dh.setTransferredDataSize(i);
                             break;
                         } else {
-                            in.read(buff);
-                            out.write(buff);
+                            int c = in.read(buff);
+                            out.write(buff, 0, c);
+                            i += c;
+                            dh.setTransferredDataSize(i);
                         }
                         dataLen -= defaultBufferSize;
                     }
@@ -107,7 +129,7 @@ public class DataProcessor {
                     @Cleanup
                     ObjectInputStream ois = new ObjectInputStream(bais);
 
-                    dh = new DataHandler(request, (Serializable) ois.readObject());
+                    dh.setData((Serializable) ois.readObject());
                 } else if (dataType == DataHandler.DataType.FILE) {
                     buff = new byte[1];
                     while (true) {
@@ -131,26 +153,24 @@ public class DataProcessor {
                     while (true) {
                         if (dataLen <= defaultBufferSize) {
                             buff = new byte[Math.toIntExact(dataLen)];
-                            in.read(buff);
-                            bos.write(buff);
+                            int c = in.read(buff);
+                            bos.write(buff, 0, c);
+                            i += c;
+                            dh.setTransferredDataSize(i);
                             break;
                         } else {
-                            in.read(buff);
-                            bos.write(buff);
+                            int c = in.read(buff);
+                            bos.write(buff, 0, c);
+                            i += c;
+                            dh.setTransferredDataSize(i);
                         }
                         dataLen -= defaultBufferSize;
                     }
                     bos.close();
                     fos.close();
-                    dh = new DataHandler(request, tempFile.toFile());
-                } else {
-                    dh = new DataHandler(request);
+
+                    dh.setFile(tempFile.toFile());
                 }
-
-                dh.setDataType(dataType);
-                dh.setTimestamp(timestamp);
-
-                socketDataHandler.receive(dh);
             }
         }
     }

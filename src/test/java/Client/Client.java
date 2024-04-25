@@ -11,9 +11,6 @@ public class Client {
 
             ClientHelper clientHelper = new ClientHelper(socket);
 
-            Thread clientThread = new Thread(clientHelper);
-            clientThread.start();
-
             clientHelper.sendText();
             Thread.sleep(3000);
 

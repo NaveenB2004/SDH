@@ -11,7 +11,7 @@ import java.net.Socket;
 
 public class ServerHelper extends SocketDataHandler {
 
-    public ServerHelper(@NonNull Socket SOCKET) {
+    public ServerHelper(@NonNull final Socket SOCKET) {
         super(SOCKET);
     }
 

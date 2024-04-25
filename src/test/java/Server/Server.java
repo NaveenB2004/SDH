@@ -20,9 +20,6 @@ public class Server {
                     System.out.println("Server : Client connected to server on  : " + socket.getRemoteSocketAddress());
 
                     ServerHelper serverHelper = new ServerHelper(socket);
-
-                    Thread serverThread = new Thread(serverHelper);
-                    serverThread.start();
                 }
             } catch (IOException e) {
                 throw new RuntimeException(e);

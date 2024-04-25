@@ -15,7 +15,9 @@ public class DataHandler {
     private long timestamp;
     @Setter(AccessLevel.PROTECTED)
     private DataType dataType;
+    @Setter(AccessLevel.PROTECTED)
     private Serializable data;
+    @Setter(AccessLevel.PROTECTED)
     private File file;
     @Setter(AccessLevel.PROTECTED)
     private long totalDataSize = -1L;
