@@ -41,7 +41,15 @@ public class ClientHelper extends SocketDataHandler {
         File file = new File("src/test/java/Common/SampleFile.jpg");
         DataHandler dataHandler = new DataHandler("/SendFile", file);
         try {
+            new Thread(() -> {
+                while (dataHandler.getTotalDataSize() == -1 ||
+                        dataHandler.getTotalDataSize() > dataHandler.getTransferredDataSize()) {
+                    System.out.println(dataHandler.getTransferredDataSize());
+                }
+            }).start();
+
             send(dataHandler);
+
             System.out.println("Client : File sent!");
         } catch (IOException e) {
             throw new RuntimeException(e);

@@ -18,7 +18,7 @@ public class DataHandler {
     private Serializable data;
     private File file;
     @Setter(AccessLevel.PROTECTED)
-    private long totalDataSize;
+    private long totalDataSize = -1L;
     @Setter(AccessLevel.PROTECTED)
     private long transferredDataSize;
 

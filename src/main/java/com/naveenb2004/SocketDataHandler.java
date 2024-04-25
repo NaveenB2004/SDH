@@ -51,8 +51,11 @@ public abstract class SocketDataHandler implements Runnable, AutoCloseable {
             }
 
             int c;
+            int i = 0;
             while ((c = bos.read(buffer)) != -1) {
                 os.write(buffer, 0, c);
+                i += c;
+                dataHandler.setTransferredDataSize(i);
             }
             os.flush();
             bos.close();
