@@ -23,6 +23,8 @@ public class DataHandler {
     private long totalDataSize = -1L;
     @Setter(AccessLevel.PROTECTED)
     private long transferredDataSize;
+    @Setter(AccessLevel.PROTECTED)
+    private boolean isCompleted;
 
     @Getter
     public enum DataType {

@@ -170,6 +170,7 @@ public class DataProcessor implements Runnable {
                     fos.close();
 
                     dh.setFile(tempFile.toFile());
+                    dh.setCompleted(true);
                 }
             }
         }

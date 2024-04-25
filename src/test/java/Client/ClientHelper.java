@@ -4,6 +4,7 @@ import Common.SampleObject;
 import com.naveenb2004.DataHandler;
 import com.naveenb2004.SocketDataHandler;
 import lombok.NonNull;
+import lombok.SneakyThrows;
 
 import java.io.File;
 import java.io.IOException;
@@ -29,31 +30,36 @@ public class ClientHelper extends SocketDataHandler {
         DataHandler dataHandler = new DataHandler("/SendText");
         try {
             send(dataHandler);
-            System.out.println("Client : Message sent!");
+            System.out.println("Client : Text sent!");
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
         System.out.println();
     }
 
+    @SneakyThrows
     protected void sendFile() {
         System.out.println("Client : Sending File...");
         File file = new File("src/test/java/Common/SampleFile.jpg");
         DataHandler dataHandler = new DataHandler("/SendFile", file);
-        try {
-            new Thread(() -> {
-                while (dataHandler.getTotalDataSize() == -1 ||
-                        dataHandler.getTotalDataSize() > dataHandler.getTransferredDataSize()) {
-                    System.out.println(dataHandler.getTransferredDataSize());
-                }
-            }).start();
 
-            send(dataHandler);
+        new Thread(() -> {
+            try {
+                send(dataHandler);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }, "Client : Send sample file").start();
 
-            System.out.println("Client : File sent!");
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+        while (dataHandler.getTotalDataSize() == -1L ||
+                dataHandler.getTotalDataSize() > dataHandler.getTransferredDataSize()) {
+            System.out.print("Client : Upload progress : " + dataHandler.getTransferredDataSize() + " / "
+                    + dataHandler.getTotalDataSize() + "\r");
+//            Thread.sleep(500);
         }
+
+        System.out.println();
+        System.out.println("Client : File sent!");
         System.out.println();
     }
 

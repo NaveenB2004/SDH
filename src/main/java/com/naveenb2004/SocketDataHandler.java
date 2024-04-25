@@ -65,6 +65,7 @@ public abstract class SocketDataHandler implements AutoCloseable {
             if (fin != null) {
                 fin.close();
             }
+            dataHandler.setCompleted(true);
         }
     }
 
