@@ -17,7 +17,7 @@ public class ClientHelper extends SocketDataHandler {
     }
 
     @Override
-    public void receive(@NonNull DataHandler update) {
+    public void onUpdateReceived(@NonNull DataHandler update) {
         System.out.println("Client : Update received!");
         System.out.println("Client : Request = " + update.getRequest());
         System.out.println("Client : Timestamp = " + update.getTimestamp());

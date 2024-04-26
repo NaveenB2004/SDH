@@ -1,5 +1,6 @@
 package com.naveenb2004;
 
+import com.naveenb2004.DataHandler.DataType;
 import lombok.*;
 
 import java.io.*;
@@ -37,10 +38,10 @@ public abstract class SocketDataHandler implements AutoCloseable {
         os.write(data);
         os.flush();
 
-        if (dataHandler.getDataType() != DataHandler.DataType.NONE) {
+        if (dataHandler.getDataType() != DataType.NONE) {
             FileInputStream fin = null;
             BufferedInputStream bos;
-            if (dataHandler.getDataType() == DataHandler.DataType.FILE) {
+            if (dataHandler.getDataType() == DataType.FILE) {
                 fin = new FileInputStream(dataHandler.getFile());
                 bos = new BufferedInputStream(fin);
             } else {
@@ -69,7 +70,7 @@ public abstract class SocketDataHandler implements AutoCloseable {
         }
     }
 
-    public abstract void receive(@NonNull DataHandler update);
+    public abstract void onUpdateReceived(@NonNull DataHandler update);
 
     public void close() throws IOException {
         if (SOCKET.isConnected()) {

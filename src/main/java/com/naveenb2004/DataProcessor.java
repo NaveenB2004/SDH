@@ -1,5 +1,6 @@
 package com.naveenb2004;
 
+import com.naveenb2004.DataHandler.DataType;
 import lombok.Cleanup;
 import lombok.NonNull;
 import lombok.SneakyThrows;
@@ -21,7 +22,7 @@ public class DataProcessor implements Runnable {
         header.append(dataHandler.getDataType().getValue()).append(",");
 
         String suffix = "";
-        if (dataHandler.getDataType() == DataHandler.DataType.OBJECT) {
+        if (dataHandler.getDataType() == DataType.OBJECT) {
             out = new ByteArrayOutputStream();
             @Cleanup
             ObjectOutputStream oOut = new ObjectOutputStream(out);
@@ -100,13 +101,13 @@ public class DataProcessor implements Runnable {
                 dh.setTimestamp(timestamp);
                 dh.setTotalDataSize(dataLen);
 
-                new Thread(() -> socketDataHandler.receive(dh),
+                new Thread(() -> socketDataHandler.onUpdateReceived(dh),
                         "SocketDataHandler : Handle request = " + request).start();
 
                 out = new ByteArrayOutputStream();
 
                 long i = 0L;
-                if (dataType == DataHandler.DataType.OBJECT) {
+                if (dataType == DataType.OBJECT) {
                     buff = new byte[Math.toIntExact(defaultBufferSize)];
                     while (true) {
                         if (dataLen <= defaultBufferSize) {
@@ -130,7 +131,7 @@ public class DataProcessor implements Runnable {
                     ObjectInputStream ois = new ObjectInputStream(bais);
 
                     dh.setData((Serializable) ois.readObject());
-                } else if (dataType == DataHandler.DataType.FILE) {
+                } else if (dataType == DataType.FILE) {
                     buff = new byte[1];
                     while (true) {
                         in.read(buff);
