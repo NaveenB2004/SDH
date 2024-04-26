@@ -3,6 +3,7 @@ package com.naveenb2004.PreUpdateHandler;
 import com.naveenb2004.DataHandler;
 import lombok.Getter;
 import lombok.NonNull;
+import lombok.Setter;
 
 @Getter
 public class PreDataHandler {
@@ -10,7 +11,8 @@ public class PreDataHandler {
     private final long UUID;
     private final String request;
     private final DataHandler.DataType dataType;
-    private long totalDataSize = -1L;
+    @Setter
+    private long totalDataSize;
     private long transferredDataSize;
     private boolean isCompleted;
 
@@ -24,17 +26,12 @@ public class PreDataHandler {
         preUpdateHandler.update(this);
     }
 
-    protected void setTotalDataSize(long totalDataSize) {
-        this.totalDataSize = totalDataSize;
-        preUpdateHandler.update(this);
-    }
-
-    protected void setTransferredDataSize(long transferredDataSize) {
+    public void setTransferredDataSize(long transferredDataSize) {
         this.transferredDataSize = transferredDataSize;
         preUpdateHandler.update(this);
     }
 
-    protected void setCompleted(boolean isCompleted) {
+    public void setCompleted(boolean isCompleted) {
         this.isCompleted = isCompleted;
         preUpdateHandler.update(this);
     }

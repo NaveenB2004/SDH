@@ -1,13 +1,14 @@
 package com.naveenb2004;
 
 import com.naveenb2004.DataHandler.DataType;
+import com.naveenb2004.PreUpdateHandler.PreDataHandler;
 import com.naveenb2004.PreUpdateHandler.PreUpdateHandler;
 import lombok.*;
 
 import java.io.*;
 import java.net.Socket;
 
-public abstract class SocketDataHandler implements AutoCloseable {
+public abstract class SocketDataHandler implements Closeable {
     @Getter
     @NonNull
     private final Socket SOCKET;
@@ -36,7 +37,9 @@ public abstract class SocketDataHandler implements AutoCloseable {
     public void send(@NonNull DataHandler dataHandler) throws IOException {
         OutputStream os = SOCKET.getOutputStream();
         byte[] buffer = new byte[Math.toIntExact(defaultBufferSize)];
-        byte[] data = DataProcessor.serialize(dataHandler);
+        PreDataHandler preDataHandler = new PreDataHandler(preUpdateHandler, dataHandler.getUUID(),
+                dataHandler.getRequest(), dataHandler.getDataType());
+        byte[] data = DataProcessor.serialize(dataHandler, preDataHandler);
 
         os.write(data);
         os.flush();
@@ -61,6 +64,7 @@ public abstract class SocketDataHandler implements AutoCloseable {
             while ((c = bos.read(buffer)) != -1) {
                 os.write(buffer, 0, c);
                 i += c;
+                preDataHandler.setTransferredDataSize(i);
             }
             os.flush();
             bos.close();
@@ -68,6 +72,7 @@ public abstract class SocketDataHandler implements AutoCloseable {
             if (fin != null) {
                 fin.close();
             }
+            preDataHandler.setCompleted(true);
         }
     }
 

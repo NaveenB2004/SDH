@@ -43,16 +43,17 @@ public class ServerHelper extends SocketDataHandler implements PreUpdateWatcher 
             System.out.println("Server : Object Details = " + object.toString());
         }
 
-        if (update.getRequest().equals("/closeConnection")) {
-            close();
-            System.out.println("Server : Connection closed!");
-        }
-
         System.out.println();
     }
 
     @Override
     public void onPreUpdateSeen(@NonNull PreDataHandler preUpdate) {
-
+        System.out.println("Server : Pre update received!");
+        System.out.println("Server : Request = " + preUpdate.getRequest());
+        System.out.println("Server : DataType = " + preUpdate.getDataType());
+        System.out.println("Server : Total data size = " + preUpdate.getTotalDataSize());
+        System.out.println("Server : Transferred data size = " + preUpdate.getTransferredDataSize());
+        System.out.println("Server : Is completed = " + preUpdate.isCompleted());
+        System.out.println();
     }
 }

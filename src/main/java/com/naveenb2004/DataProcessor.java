@@ -1,6 +1,7 @@
 package com.naveenb2004;
 
 import com.naveenb2004.DataHandler.DataType;
+import com.naveenb2004.PreUpdateHandler.PreDataHandler;
 import lombok.Cleanup;
 import lombok.NonNull;
 import lombok.SneakyThrows;
@@ -12,7 +13,8 @@ import java.nio.file.Path;
 
 public class DataProcessor implements Runnable {
     @NonNull
-    protected static byte[] serialize(@NonNull DataHandler dataHandler) throws IOException {
+    protected static byte[] serialize(@NonNull DataHandler dataHandler,
+                                      @NonNull PreDataHandler preDataHandler) throws IOException {
         ByteArrayOutputStream out;
 
         dataHandler.setTimestamp(DataHandler.timestamp());
@@ -30,11 +32,13 @@ public class DataProcessor implements Runnable {
             oOut.flush();
             long length = out.toByteArray().length;
             header.append(length);
+            preDataHandler.setTotalDataSize(length);
         } else if (dataHandler.getDataType() == DataHandler.DataType.FILE) {
             File file = dataHandler.getFile();
             suffix = file.getName().substring(file.getName().lastIndexOf(".") + 1) + "$";
             long length = file.length();
             header.append(length);
+            preDataHandler.setTotalDataSize(length);
         } else {
             header.append("0");
         }
@@ -93,6 +97,9 @@ public class DataProcessor implements Runnable {
 
                 DataHandler dh = new DataHandler(request);
                 DataHandler.DataType dataType = DataHandler.DataType.getType(dataTypeVal);
+                PreDataHandler pdh = new PreDataHandler(socketDataHandler.getPreUpdateHandler(),
+                        dh.getUUID(), request, dataType);
+                pdh.setTotalDataSize(dataLen);
 
                 dh.setDataType(dataType);
                 dh.setTimestamp(timestamp);
@@ -108,11 +115,13 @@ public class DataProcessor implements Runnable {
                             int c = in.read(buff);
                             out.write(buff, 0, c);
                             i += c;
+                            pdh.setTransferredDataSize(i);
                             break;
                         } else {
                             int c = in.read(buff);
                             out.write(buff, 0, c);
                             i += c;
+                            pdh.setTransferredDataSize(i);
                         }
                         dataLen -= defaultBufferSize;
                     }
@@ -148,11 +157,13 @@ public class DataProcessor implements Runnable {
                             int c = in.read(buff);
                             bos.write(buff, 0, c);
                             i += c;
+                            pdh.setTransferredDataSize(i);
                             break;
                         } else {
                             int c = in.read(buff);
                             bos.write(buff, 0, c);
                             i += c;
+                            pdh.setTransferredDataSize(i);
                         }
                         dataLen -= defaultBufferSize;
                     }
@@ -160,8 +171,10 @@ public class DataProcessor implements Runnable {
                     fos.close();
 
                     dh.setFile(tempFile.toFile());
-                    socketDataHandler.onUpdateReceived(dh);
                 }
+                
+                pdh.setCompleted(true);
+                socketDataHandler.onUpdateReceived(dh);
             }
         }
     }
