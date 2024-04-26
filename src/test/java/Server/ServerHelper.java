@@ -2,9 +2,10 @@ package Server;
 
 import Common.SampleObject;
 import com.naveenb2004.DataHandler;
+import com.naveenb2004.PreUpdateHandler.PreDataHandler;
+import com.naveenb2004.PreUpdateHandler.PreUpdateHandler;
+import com.naveenb2004.PreUpdateHandler.PreUpdateWatcher;
 import com.naveenb2004.SocketDataHandler;
-import com.naveenb2004.UpdateHandler.UpdateHandler;
-import com.naveenb2004.UpdateHandler.UpdateWatcher;
 import lombok.NonNull;
 import lombok.SneakyThrows;
 
@@ -12,11 +13,12 @@ import java.awt.*;
 import java.io.IOException;
 import java.net.Socket;
 
-public class ServerHelper extends SocketDataHandler implements UpdateWatcher {
+public class ServerHelper extends SocketDataHandler implements PreUpdateWatcher {
 
     public ServerHelper(@NonNull final Socket SOCKET) {
         super(SOCKET);
-        new UpdateHandler().addWatcher(this);
+        PreUpdateHandler preUpdateHandler = getPreUpdateHandler();
+        preUpdateHandler.addWatcher(this);
     }
 
     @SneakyThrows
@@ -50,7 +52,7 @@ public class ServerHelper extends SocketDataHandler implements UpdateWatcher {
     }
 
     @Override
-    public void onUpdateSeen() {
+    public void onPreUpdateSeen(@NonNull PreDataHandler preUpdate) {
 
     }
 }

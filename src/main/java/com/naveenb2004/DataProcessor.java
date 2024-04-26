@@ -30,16 +30,13 @@ public class DataProcessor implements Runnable {
             oOut.flush();
             long length = out.toByteArray().length;
             header.append(length);
-            dataHandler.setTotalDataSize(length);
         } else if (dataHandler.getDataType() == DataHandler.DataType.FILE) {
             File file = dataHandler.getFile();
             suffix = file.getName().substring(file.getName().lastIndexOf(".") + 1) + "$";
             long length = file.length();
             header.append(length);
-            dataHandler.setTotalDataSize(length);
         } else {
             header.append("0");
-            dataHandler.setTotalDataSize(0L);
         }
         header.append("}");
         header.append(dataHandler.getRequest()).append(dataHandler.getTimestamp());
@@ -51,7 +48,7 @@ public class DataProcessor implements Runnable {
     }
 
     @NonNull
-    final SocketDataHandler socketDataHandler;
+    private final SocketDataHandler socketDataHandler;
 
     public DataProcessor(@NonNull final SocketDataHandler socketDataHandler) {
         this.socketDataHandler = socketDataHandler;
@@ -99,10 +96,6 @@ public class DataProcessor implements Runnable {
 
                 dh.setDataType(dataType);
                 dh.setTimestamp(timestamp);
-                dh.setTotalDataSize(dataLen);
-
-                new Thread(() -> socketDataHandler.onUpdateReceived(dh),
-                        "SocketDataHandler : Handle request = " + request).start();
 
                 out = new ByteArrayOutputStream();
 
@@ -115,13 +108,11 @@ public class DataProcessor implements Runnable {
                             int c = in.read(buff);
                             out.write(buff, 0, c);
                             i += c;
-                            dh.setTransferredDataSize(i);
                             break;
                         } else {
                             int c = in.read(buff);
                             out.write(buff, 0, c);
                             i += c;
-                            dh.setTransferredDataSize(i);
                         }
                         dataLen -= defaultBufferSize;
                     }
@@ -157,13 +148,11 @@ public class DataProcessor implements Runnable {
                             int c = in.read(buff);
                             bos.write(buff, 0, c);
                             i += c;
-                            dh.setTransferredDataSize(i);
                             break;
                         } else {
                             int c = in.read(buff);
                             bos.write(buff, 0, c);
                             i += c;
-                            dh.setTransferredDataSize(i);
                         }
                         dataLen -= defaultBufferSize;
                     }
@@ -171,7 +160,7 @@ public class DataProcessor implements Runnable {
                     fos.close();
 
                     dh.setFile(tempFile.toFile());
-                    dh.setCompleted(true);
+                    socketDataHandler.onUpdateReceived(dh);
                 }
             }
         }

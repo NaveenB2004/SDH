@@ -1,4 +1,4 @@
-package com.naveenb2004.UpdateHandler;
+package com.naveenb2004.PreUpdateHandler;
 
 import com.naveenb2004.DataHandler;
 import lombok.AccessLevel;
@@ -8,6 +8,7 @@ import lombok.Setter;
 
 @Getter
 public class PreDataHandler {
+
     private final long UUID;
     private final String request;
     @Setter(AccessLevel.PROTECTED)
@@ -18,9 +19,12 @@ public class PreDataHandler {
     private long transferredDataSize;
     @Setter(AccessLevel.PROTECTED)
     private boolean isCompleted;
-    
-    public PreDataHandler(long UUID, @NonNull String request) {
+
+    public PreDataHandler(long UUID, @NonNull String request, @NonNull DataHandler.DataType dataType) {
         this.UUID = UUID;
         this.request = request;
+        this.dataType = dataType;
+
+        new PreUpdateHandler().update(this);
     }
 }
