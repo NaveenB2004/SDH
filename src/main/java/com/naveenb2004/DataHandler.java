@@ -10,6 +10,9 @@ import java.io.Serializable;
 
 @Getter
 public class DataHandler {
+    protected static long UUIDGenerator = 0L;
+
+    private final long UUID;
     private final String request;
     @Setter(AccessLevel.PROTECTED)
     private long timestamp;
@@ -19,12 +22,6 @@ public class DataHandler {
     private Serializable data;
     @Setter(AccessLevel.PROTECTED)
     private File file;
-    @Setter(AccessLevel.PROTECTED)
-    private long totalDataSize = -1L;
-    @Setter(AccessLevel.PROTECTED)
-    private long transferredDataSize;
-    @Setter(AccessLevel.PROTECTED)
-    private boolean isCompleted;
 
     @Getter
     public enum DataType {
@@ -53,6 +50,7 @@ public class DataHandler {
     public DataHandler(@NonNull String request) {
         this.request = request;
         this.dataType = DataType.NONE;
+        UUID = UUIDGenerator++;
     }
 
     public DataHandler(@NonNull String request,
@@ -60,6 +58,7 @@ public class DataHandler {
         this.request = request;
         this.dataType = DataType.OBJECT;
         this.data = data;
+        UUID = UUIDGenerator++;
     }
 
     public DataHandler(@NonNull String request,
@@ -70,6 +69,7 @@ public class DataHandler {
         this.request = request;
         this.dataType = DataType.FILE;
         this.file = file;
+        UUID = UUIDGenerator++;
     }
 
     protected static long timestamp() {
