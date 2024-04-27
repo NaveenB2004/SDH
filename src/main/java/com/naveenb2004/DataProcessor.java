@@ -64,8 +64,7 @@ public class DataProcessor implements Runnable {
         InputStream in = socketDataHandler.getSOCKET().getInputStream();
         ByteArrayOutputStream out;
         byte[] buff;
-        boolean isSocketOpen = true;
-        while (isSocketOpen) {
+        while (!socketDataHandler.getSOCKET().isClosed()) {
             System.out.println("Lib : ID = " + socketDataHandler.id);
             System.out.println("Lib : Socket status = " + socketDataHandler.getSOCKET().isClosed());
             System.out.println("Lib : Receiver loop = running");
