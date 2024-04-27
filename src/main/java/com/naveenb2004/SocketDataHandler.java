@@ -12,6 +12,7 @@ public abstract class SocketDataHandler implements Closeable {
     @Getter
     @NonNull
     private final Socket SOCKET;
+    private final Thread t;
     @Getter
     protected static long defaultBufferSize = 1024L;
     @Getter
@@ -23,7 +24,8 @@ public abstract class SocketDataHandler implements Closeable {
 
     public SocketDataHandler(@NonNull final Socket SOCKET) {
         this.SOCKET = SOCKET;
-        new Thread(new DataProcessor(this)).start();
+        t = new Thread(new DataProcessor(this));
+        t.start();
     }
 
     public static void setDefaultBufferSize(long defaultBufferSize) {
@@ -79,8 +81,11 @@ public abstract class SocketDataHandler implements Closeable {
     public abstract void onUpdateReceived(@NonNull DataHandler update);
 
     public void close() throws IOException {
-        if (SOCKET.isConnected()) {
+        if (!SOCKET.isClosed()) {
             SOCKET.close();
+        }
+        if (t.isAlive()) {
+            t.interrupt();
         }
     }
 }

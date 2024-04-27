@@ -64,7 +64,10 @@ public class DataProcessor implements Runnable {
         InputStream in = socketDataHandler.getSOCKET().getInputStream();
         ByteArrayOutputStream out;
         byte[] buff;
-        while (true) {
+        while (!socketDataHandler.getSOCKET().isClosed()) {
+            System.out.println(socketDataHandler.getSOCKET().isClosed());
+            System.out.println("running");
+            Thread.sleep(1000);
             if (in.read() == '{') {
                 long defaultBufferSize = SocketDataHandler.defaultBufferSize;
                 File tempFolder = SocketDataHandler.tempFolder;
@@ -172,7 +175,7 @@ public class DataProcessor implements Runnable {
 
                     dh.setFile(tempFile.toFile());
                 }
-                
+
                 pdh.setCompleted(true);
                 socketDataHandler.onUpdateReceived(dh);
             }
