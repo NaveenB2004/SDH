@@ -14,13 +14,14 @@ public abstract class SocketDataHandler implements Closeable {
     private final Socket SOCKET;
     private final Thread t;
     @Getter
-    protected static long defaultBufferSize = 1024L;
+    private static long defaultBufferSize = 1024L;
     @Getter
     @Setter
     @NonNull
-    protected static File tempFolder = new File("Temp");
+    private static File tempFolder = new File("Temp");
     @Getter
     private final PreUpdateHandler preUpdateHandler = new PreUpdateHandler();
+    public String id;
 
     public SocketDataHandler(@NonNull final Socket SOCKET) {
         this.SOCKET = SOCKET;
@@ -40,7 +41,7 @@ public abstract class SocketDataHandler implements Closeable {
         OutputStream os = SOCKET.getOutputStream();
         byte[] buffer = new byte[Math.toIntExact(defaultBufferSize)];
         PreDataHandler preDataHandler = new PreDataHandler(preUpdateHandler, dataHandler.getUUID(),
-                dataHandler.getRequest(), dataHandler.getDataType());
+                dataHandler.getRequest(), PreDataHandler.Method.SEND, dataHandler.getDataType());
         byte[] data = DataProcessor.serialize(dataHandler, preDataHandler);
 
         os.write(data);
@@ -81,11 +82,14 @@ public abstract class SocketDataHandler implements Closeable {
     public abstract void onUpdateReceived(@NonNull DataHandler update);
 
     public void close() throws IOException {
+        System.out.println("Lib : Close called by id = " + id);
         if (!SOCKET.isClosed()) {
             SOCKET.close();
+            System.out.println("Lib : Socket closed by id = " + id);
         }
         if (t.isAlive()) {
             t.interrupt();
+            System.out.println("Lib : Socket thread interrupted by id = " + id);
         }
     }
 }

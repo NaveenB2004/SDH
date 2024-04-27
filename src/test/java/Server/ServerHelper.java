@@ -50,10 +50,23 @@ public class ServerHelper extends SocketDataHandler implements PreUpdateWatcher 
     public void onPreUpdateSeen(@NonNull PreDataHandler preUpdate) {
         System.out.println("Server : Pre update received!");
         System.out.println("Server : Request = " + preUpdate.getRequest());
+        System.out.println("Server : Update method = " + preUpdate.getMethod());
         System.out.println("Server : DataType = " + preUpdate.getDataType());
         System.out.println("Server : Total data size = " + preUpdate.getTotalDataSize());
         System.out.println("Server : Transferred data size = " + preUpdate.getTransferredDataSize());
         System.out.println("Server : Is completed = " + preUpdate.isCompleted());
+        System.out.println();
+    }
+
+    protected void sendText() {
+        System.out.println("Server : Sending Text...");
+        DataHandler dataHandler = new DataHandler("/SendTextByServer");
+        try {
+            send(dataHandler);
+            System.out.println("Server : Text sent!");
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
         System.out.println();
     }
 }

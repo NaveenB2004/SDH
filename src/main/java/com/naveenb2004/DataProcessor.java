@@ -64,13 +64,16 @@ public class DataProcessor implements Runnable {
         InputStream in = socketDataHandler.getSOCKET().getInputStream();
         ByteArrayOutputStream out;
         byte[] buff;
-        while (!socketDataHandler.getSOCKET().isClosed()) {
-            System.out.println(socketDataHandler.getSOCKET().isClosed());
-            System.out.println("running");
+        boolean isSocketOpen = true;
+        while (isSocketOpen) {
+            System.out.println("Lib : ID = " + socketDataHandler.id);
+            System.out.println("Lib : Socket status = " + socketDataHandler.getSOCKET().isClosed());
+            System.out.println("Lib : Receiver loop = running");
+            System.out.println();
             Thread.sleep(1000);
             if (in.read() == '{') {
-                long defaultBufferSize = SocketDataHandler.defaultBufferSize;
-                File tempFolder = SocketDataHandler.tempFolder;
+                long defaultBufferSize = SocketDataHandler.getDefaultBufferSize();
+                File tempFolder = SocketDataHandler.getTempFolder();
 
                 out = new ByteArrayOutputStream();
                 buff = new byte[1];
@@ -101,7 +104,7 @@ public class DataProcessor implements Runnable {
                 DataHandler dh = new DataHandler(request);
                 DataHandler.DataType dataType = DataHandler.DataType.getType(dataTypeVal);
                 PreDataHandler pdh = new PreDataHandler(socketDataHandler.getPreUpdateHandler(),
-                        dh.getUUID(), request, dataType);
+                        dh.getUUID(), request, PreDataHandler.Method.RECEIVE, dataType);
                 pdh.setTotalDataSize(dataLen);
 
                 dh.setDataType(dataType);

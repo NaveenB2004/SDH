@@ -14,13 +14,14 @@ public class Server {
                 ServerSocket serverSocket = new ServerSocket(port);
                 System.out.println("Server : Server started on port " + port);
 
-                while (true) {
-                    System.out.println("Server : Waiting for clients...");
-                    Socket socket = serverSocket.accept();
-                    System.out.println("Server : Client connected to server on  : " + socket.getRemoteSocketAddress());
+                System.out.println("Server : Waiting for client...");
+                Socket socket = serverSocket.accept();
+                System.out.println("Server : Client connected to server on  : " + socket.getRemoteSocketAddress());
 
-                    ServerHelper serverHelper = new ServerHelper(socket);
-                }
+                ServerHelper serverHelper = new ServerHelper(socket);
+                serverHelper.id = "SERVER";
+
+                serverHelper.sendText();
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
