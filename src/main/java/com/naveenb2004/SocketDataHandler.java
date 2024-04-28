@@ -23,7 +23,7 @@ public abstract class SocketDataHandler implements Closeable {
     private final PreUpdateHandler preUpdateHandler = new PreUpdateHandler();
     public String id;
 
-    public SocketDataHandler(@NonNull final Socket SOCKET) {
+    public SocketDataHandler(@NonNull Socket SOCKET) {
         this.SOCKET = SOCKET;
         t = new Thread(new DataProcessor(this));
         t.start();
