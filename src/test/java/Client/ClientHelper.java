@@ -2,6 +2,7 @@ package Client;
 
 import Common.SampleObject;
 import com.naveenb2004.DataHandler;
+import com.naveenb2004.DataProcessor;
 import com.naveenb2004.SocketDataHandler;
 import lombok.NonNull;
 
@@ -22,6 +23,14 @@ public class ClientHelper extends SocketDataHandler {
         System.out.println("Client : Timestamp = " + update.getTimestamp());
         System.out.println("Client : DataType = " + update.getDataType());
         System.out.println();
+    }
+
+    @Override
+    public void onDisconnected(DataProcessor.@NonNull DisconnectStatus status, Exception exception) {
+        System.out.println(status);
+        if (exception != null) {
+            throw new RuntimeException(exception);
+        }
     }
 
     protected void sendText() {

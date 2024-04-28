@@ -84,6 +84,8 @@ public abstract class SocketDataHandler implements Closeable {
 
     public abstract void onUpdateReceived(@NonNull DataHandler update);
 
+    public abstract void onDisconnected(@NonNull DataProcessor.DisconnectStatus status, Exception exception);
+
     public void close() throws IOException {
         if (!SOCKET.isClosed()) {
             SOCKET.close();

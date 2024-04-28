@@ -4,7 +4,6 @@ import com.naveenb2004.DataHandler.DataType;
 import com.naveenb2004.PreUpdateHandler.PreDataHandler;
 import lombok.Cleanup;
 import lombok.NonNull;
-import lombok.SneakyThrows;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
@@ -12,6 +11,13 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 public class DataProcessor extends Thread {
+    public enum DisconnectStatus {
+        SOCKET_CLOSED,
+        OTHER_IO_EXCEPTION_CAUGHT,
+        INVALID_HEADER_DETECTED,
+        INVALID_OBJECT_RECEIVED
+    }
+
     @NonNull
     protected static byte[] serialize(@NonNull DataHandler dataHandler,
                                       PreDataHandler preDataHandler) throws IOException {
@@ -58,139 +64,149 @@ public class DataProcessor extends Thread {
         this.SOCKET_DATA_HANDLER = socketDataHandler;
     }
 
-    @SneakyThrows
     @Override
     public void run() {
-        InputStream in = SOCKET_DATA_HANDLER.getSOCKET().getInputStream();
-        ByteArrayOutputStream out;
-        byte[] buff;
-        while (!SOCKET_DATA_HANDLER.getSOCKET().isClosed()) {
-            int validator = in.read();
-            if (validator == '{') {
-                long defaultBufferSize = SocketDataHandler.getDefaultBufferSize();
-                File tempFolder = SocketDataHandler.getTempFolder();
+        try {
+            InputStream in = SOCKET_DATA_HANDLER.getSOCKET().getInputStream();
+            ByteArrayOutputStream out;
+            byte[] buff;
+            while (true) {
+                int validator = in.read();
+                if (validator == '{') {
+                    long defaultBufferSize = SocketDataHandler.getDefaultBufferSize();
+                    File tempFolder = SocketDataHandler.getTempFolder();
 
-                out = new ByteArrayOutputStream();
-                buff = new byte[1];
-                while (true) {
+                    out = new ByteArrayOutputStream();
+                    buff = new byte[1];
+                    while (true) {
+                        in.read(buff);
+
+                        if (new String(buff, StandardCharsets.UTF_8).equals("}")) {
+                            break;
+                        }
+
+                        out.write(buff);
+                    }
+
+                    String[] headers = out.toString(StandardCharsets.UTF_8).split(",");
+                    int requestLen = Integer.parseInt(headers[0]);
+                    int timestampLen = 13;
+                    String dataTypeVal = headers[1];
+                    long dataLen = Long.parseLong(headers[2]);
+
+                    buff = new byte[requestLen];
                     in.read(buff);
+                    String request = new String(buff, StandardCharsets.UTF_8);
 
-                    if (new String(buff, StandardCharsets.UTF_8).equals("}")) {
-                        break;
+                    buff = new byte[timestampLen];
+                    in.read(buff);
+                    long timestamp = Long.parseLong(new String(buff, StandardCharsets.UTF_8));
+
+                    DataHandler dh = new DataHandler(request);
+                    DataHandler.DataType dataType = DataHandler.DataType.getType(dataTypeVal);
+                    PreDataHandler pdh = null;
+                    if (dataType != DataType.NONE) {
+                        pdh = new PreDataHandler(SOCKET_DATA_HANDLER.getPRE_UPDATE_HANDLER(),
+                                dh.getUUID(), request, PreDataHandler.Method.RECEIVE, dataType);
+                        pdh.setTotalDataSize(dataLen);
                     }
 
-                    out.write(buff);
-                }
+                    dh.setDataType(dataType);
+                    dh.setTimestamp(timestamp);
 
-                String[] headers = out.toString(StandardCharsets.UTF_8).split(",");
-                int requestLen = Integer.parseInt(headers[0]);
-                int timestampLen = 13;
-                String dataTypeVal = headers[1];
-                long dataLen = Long.parseLong(headers[2]);
+                    out = new ByteArrayOutputStream();
 
-                buff = new byte[requestLen];
-                in.read(buff);
-                String request = new String(buff, StandardCharsets.UTF_8);
-
-                buff = new byte[timestampLen];
-                in.read(buff);
-                long timestamp = Long.parseLong(new String(buff, StandardCharsets.UTF_8));
-
-                DataHandler dh = new DataHandler(request);
-                DataHandler.DataType dataType = DataHandler.DataType.getType(dataTypeVal);
-                PreDataHandler pdh = null;
-                if (dataType != DataType.NONE) {
-                    pdh = new PreDataHandler(SOCKET_DATA_HANDLER.getPRE_UPDATE_HANDLER(),
-                            dh.getUUID(), request, PreDataHandler.Method.RECEIVE, dataType);
-                    pdh.setTotalDataSize(dataLen);
-                }
-
-                dh.setDataType(dataType);
-                dh.setTimestamp(timestamp);
-
-                out = new ByteArrayOutputStream();
-
-                if (dataType != DataType.NONE) {
-                    long i = 0L;
-                    if (dataType == DataType.OBJECT) {
-                        buff = new byte[Math.toIntExact(defaultBufferSize)];
-                        while (true) {
-                            if (dataLen <= defaultBufferSize) {
-                                buff = new byte[Math.toIntExact(dataLen)];
-                                int c = in.read(buff);
-                                out.write(buff, 0, c);
-                                i += c;
-                                pdh.setTransferredDataSize(i);
-                                break;
-                            } else {
-                                int c = in.read(buff);
-                                out.write(buff, 0, c);
-                                i += c;
-                                pdh.setTransferredDataSize(i);
+                    if (dataType != DataType.NONE) {
+                        long i = 0L;
+                        if (dataType == DataType.OBJECT) {
+                            buff = new byte[Math.toIntExact(defaultBufferSize)];
+                            while (true) {
+                                if (dataLen <= defaultBufferSize) {
+                                    buff = new byte[Math.toIntExact(dataLen)];
+                                    int c = in.read(buff);
+                                    out.write(buff, 0, c);
+                                    i += c;
+                                    pdh.setTransferredDataSize(i);
+                                    break;
+                                } else {
+                                    int c = in.read(buff);
+                                    out.write(buff, 0, c);
+                                    i += c;
+                                    pdh.setTransferredDataSize(i);
+                                }
+                                dataLen -= defaultBufferSize;
                             }
-                            dataLen -= defaultBufferSize;
-                        }
-                        @Cleanup
-                        ByteArrayInputStream bais = new ByteArrayInputStream(out.toByteArray());
-                        @Cleanup
-                        ObjectInputStream ois = new ObjectInputStream(bais);
+                            @Cleanup
+                            ByteArrayInputStream bais = new ByteArrayInputStream(out.toByteArray());
+                            @Cleanup
+                            ObjectInputStream ois = new ObjectInputStream(bais);
 
-                        dh.setData((Serializable) ois.readObject());
-                    } else if (dataType == DataType.FILE) {
-                        buff = new byte[1];
-                        while (true) {
-                            in.read(buff);
+                            dh.setData((Serializable) ois.readObject());
+                        } else if (dataType == DataType.FILE) {
+                            buff = new byte[1];
+                            while (true) {
+                                in.read(buff);
 
-                            if (new String(buff, StandardCharsets.UTF_8).equals("$")) {
-                                break;
+                                if (new String(buff, StandardCharsets.UTF_8).equals("$")) {
+                                    break;
+                                }
+
+                                out.write(buff);
                             }
 
-                            out.write(buff);
-                        }
-
-                        if (!tempFolder.exists()) {
-                            tempFolder.mkdirs();
-                        }
-                        Path tempFile = Files.createTempFile(tempFolder.toPath(), null,
-                                "." + out.toString(StandardCharsets.UTF_8));
-                        FileOutputStream fos = new FileOutputStream(tempFile.toFile());
-                        BufferedOutputStream bos = new BufferedOutputStream(fos);
-                        buff = new byte[Math.toIntExact(defaultBufferSize)];
-                        while (true) {
-                            if (dataLen <= defaultBufferSize) {
-                                buff = new byte[Math.toIntExact(dataLen)];
-                                int c = in.read(buff);
-                                bos.write(buff, 0, c);
-                                i += c;
-                                pdh.setTransferredDataSize(i);
-                                break;
-                            } else {
-                                int c = in.read(buff);
-                                bos.write(buff, 0, c);
-                                i += c;
-                                pdh.setTransferredDataSize(i);
+                            if (!tempFolder.exists()) {
+                                tempFolder.mkdirs();
                             }
-                            dataLen -= defaultBufferSize;
-                        }
-                        bos.close();
-                        fos.close();
+                            Path tempFile = Files.createTempFile(tempFolder.toPath(), null,
+                                    "." + out.toString(StandardCharsets.UTF_8));
+                            FileOutputStream fos = new FileOutputStream(tempFile.toFile());
+                            BufferedOutputStream bos = new BufferedOutputStream(fos);
+                            buff = new byte[Math.toIntExact(defaultBufferSize)];
+                            while (true) {
+                                if (dataLen <= defaultBufferSize) {
+                                    buff = new byte[Math.toIntExact(dataLen)];
+                                    int c = in.read(buff);
+                                    bos.write(buff, 0, c);
+                                    i += c;
+                                    pdh.setTransferredDataSize(i);
+                                    break;
+                                } else {
+                                    int c = in.read(buff);
+                                    bos.write(buff, 0, c);
+                                    i += c;
+                                    pdh.setTransferredDataSize(i);
+                                }
+                                dataLen -= defaultBufferSize;
+                            }
+                            bos.close();
+                            fos.close();
 
-                        dh.setFile(tempFile.toFile());
+                            dh.setFile(tempFile.toFile());
+                        }
+
+                        pdh.setCompleted(true);
                     }
 
-                    pdh.setCompleted(true);
-                }
-
-                SOCKET_DATA_HANDLER.onUpdateReceived(dh);
-            } else {
-                SOCKET_DATA_HANDLER.close();
-
-                if (validator == -1) {
-                    throw new RuntimeException("Client disconnected!");
+                    SOCKET_DATA_HANDLER.onUpdateReceived(dh);
                 } else {
-                    throw new RuntimeException("Invalid input stream detected!");
+                    SOCKET_DATA_HANDLER.close();
+
+                    if (validator == -1) {
+                        SOCKET_DATA_HANDLER.onDisconnected(DisconnectStatus.SOCKET_CLOSED, null);
+                        break;
+                    } else {
+                        SOCKET_DATA_HANDLER.onDisconnected(DisconnectStatus.INVALID_HEADER_DETECTED, null);
+                    }
                 }
             }
+        } catch (IOException e) {
+            if (e.getMessage().equals("Socket closed")) {
+                SOCKET_DATA_HANDLER.onDisconnected(DisconnectStatus.SOCKET_CLOSED, null);
+            } else {
+                SOCKET_DATA_HANDLER.onDisconnected(DisconnectStatus.OTHER_IO_EXCEPTION_CAUGHT, e);
+            }
+        } catch (ClassNotFoundException e) {
+            SOCKET_DATA_HANDLER.onDisconnected(DisconnectStatus.INVALID_OBJECT_RECEIVED, e);
         }
     }
 }

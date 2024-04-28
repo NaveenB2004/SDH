@@ -2,6 +2,7 @@ package Server;
 
 import Common.SampleObject;
 import com.naveenb2004.DataHandler;
+import com.naveenb2004.DataProcessor;
 import com.naveenb2004.PreUpdateHandler.PreDataHandler;
 import com.naveenb2004.PreUpdateHandler.PreUpdateHandler;
 import com.naveenb2004.PreUpdateHandler.PreUpdateWatcher;
@@ -44,6 +45,14 @@ public class ServerHelper extends SocketDataHandler implements PreUpdateWatcher 
         }
 
         System.out.println();
+    }
+
+    @Override
+    public void onDisconnected(DataProcessor.@NonNull DisconnectStatus status, Exception exception) {
+        System.out.println(status);
+        if (exception != null) {
+            throw new RuntimeException(exception);
+        }
     }
 
     @Override
