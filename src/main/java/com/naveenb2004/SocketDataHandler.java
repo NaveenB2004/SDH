@@ -12,7 +12,7 @@ public abstract class SocketDataHandler implements Closeable {
     @Getter
     @NonNull
     private final Socket SOCKET;
-    private final Thread t;
+    private final Thread DATA_PROCESSOR = new DataProcessor(this);
     @Getter
     private static long defaultBufferSize = 1024L;
     @Getter
@@ -20,13 +20,12 @@ public abstract class SocketDataHandler implements Closeable {
     @NonNull
     private static File tempFolder = new File("Temp");
     @Getter
-    private final PreUpdateHandler preUpdateHandler = new PreUpdateHandler();
+    private final PreUpdateHandler PRE_UPDATE_HANDLER = new PreUpdateHandler();
     public String id;
 
     public SocketDataHandler(@NonNull Socket SOCKET) {
         this.SOCKET = SOCKET;
-        t = new Thread(new DataProcessor(this));
-        t.start();
+        DATA_PROCESSOR.start();
     }
 
     public static void setDefaultBufferSize(long defaultBufferSize) {
@@ -40,8 +39,11 @@ public abstract class SocketDataHandler implements Closeable {
     public void send(@NonNull DataHandler dataHandler) throws IOException {
         OutputStream os = SOCKET.getOutputStream();
         byte[] buffer = new byte[Math.toIntExact(defaultBufferSize)];
-        PreDataHandler preDataHandler = new PreDataHandler(preUpdateHandler, dataHandler.getUUID(),
-                dataHandler.getRequest(), PreDataHandler.Method.SEND, dataHandler.getDataType());
+        PreDataHandler preDataHandler = null;
+        if (dataHandler.getDataType() != DataType.NONE) {
+            preDataHandler = new PreDataHandler(PRE_UPDATE_HANDLER, dataHandler.getUUID(),
+                    dataHandler.getRequest(), PreDataHandler.Method.SEND, dataHandler.getDataType());
+        }
         byte[] data = DataProcessor.serialize(dataHandler, preDataHandler);
 
         os.write(data);
@@ -82,14 +84,11 @@ public abstract class SocketDataHandler implements Closeable {
     public abstract void onUpdateReceived(@NonNull DataHandler update);
 
     public void close() throws IOException {
-        System.out.println("Lib : Close called by id = " + id);
         if (!SOCKET.isClosed()) {
             SOCKET.close();
-            System.out.println("Lib : Socket closed by id = " + id);
         }
-        if (t.isAlive()) {
-            t.interrupt();
-            System.out.println("Lib : Socket thread interrupted by id = " + id);
+        if (DATA_PROCESSOR.isAlive()) {
+            DATA_PROCESSOR.interrupt();
         }
     }
 }

@@ -17,7 +17,7 @@ public class ServerHelper extends SocketDataHandler implements PreUpdateWatcher 
 
     public ServerHelper(@NonNull final Socket SOCKET) {
         super(SOCKET);
-        PreUpdateHandler preUpdateHandler = getPreUpdateHandler();
+        PreUpdateHandler preUpdateHandler = getPRE_UPDATE_HANDLER();
         preUpdateHandler.addWatcher(this);
     }
 
