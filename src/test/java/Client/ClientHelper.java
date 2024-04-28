@@ -27,9 +27,9 @@ public class ClientHelper extends SocketDataHandler {
 
     @Override
     public void onDisconnected(DataProcessor.@NonNull DisconnectStatus status, Exception exception) {
-        System.out.println(status);
+        System.out.println("Client : " + status);
         if (exception != null) {
-            throw new RuntimeException(exception);
+            throw new RuntimeException("Client : " + exception);
         }
     }
 

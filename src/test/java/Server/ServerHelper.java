@@ -49,9 +49,9 @@ public class ServerHelper extends SocketDataHandler implements PreUpdateWatcher 
 
     @Override
     public void onDisconnected(DataProcessor.@NonNull DisconnectStatus status, Exception exception) {
-        System.out.println(status);
+        System.out.println("Server : " + status);
         if (exception != null) {
-            throw new RuntimeException(exception);
+            throw new RuntimeException("Server : " + exception);
         }
     }
 
