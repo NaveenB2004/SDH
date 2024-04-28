@@ -12,7 +12,6 @@ public abstract class SocketDataHandler implements Closeable {
     @Getter
     @NonNull
     private final Socket SOCKET;
-    private final Thread DATA_PROCESSOR = new DataProcessor(this);
     @Getter
     private static long defaultBufferSize = 1024L;
     @Getter
@@ -25,6 +24,8 @@ public abstract class SocketDataHandler implements Closeable {
 
     public SocketDataHandler(@NonNull Socket SOCKET) {
         this.SOCKET = SOCKET;
+        Thread DATA_PROCESSOR = new DataProcessor(this);
+        DATA_PROCESSOR.setName("SocketDataHandler - DataProcessor");
         DATA_PROCESSOR.start();
     }
 
@@ -86,9 +87,6 @@ public abstract class SocketDataHandler implements Closeable {
     public void close() throws IOException {
         if (!SOCKET.isClosed()) {
             SOCKET.close();
-        }
-        if (DATA_PROCESSOR.isAlive()) {
-            DATA_PROCESSOR.interrupt();
         }
     }
 }

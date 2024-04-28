@@ -64,8 +64,9 @@ public class DataProcessor extends Thread {
         InputStream in = SOCKET_DATA_HANDLER.getSOCKET().getInputStream();
         ByteArrayOutputStream out;
         byte[] buff;
-        while (true) {
-            if (in.read() == '{') {
+        while (!SOCKET_DATA_HANDLER.getSOCKET().isClosed()) {
+            int validator = in.read();
+            if (validator == '{') {
                 long defaultBufferSize = SocketDataHandler.getDefaultBufferSize();
                 File tempFolder = SocketDataHandler.getTempFolder();
 
@@ -182,10 +183,14 @@ public class DataProcessor extends Thread {
 
                 SOCKET_DATA_HANDLER.onUpdateReceived(dh);
             } else {
-                break;
+                SOCKET_DATA_HANDLER.close();
+
+                if (validator == -1) {
+                    throw new RuntimeException("Client disconnected!");
+                } else {
+                    throw new RuntimeException("Invalid input stream detected!");
+                }
             }
         }
-
-        SOCKET_DATA_HANDLER.close();
     }
 }
