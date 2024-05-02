@@ -6,19 +6,22 @@
 
     <groupId>com.naveenb2004</groupId>
     <artifactId>SocketDataHandler</artifactId>
-    <version>1.1</version>
+    <version>1.1.0</version>
 
     <properties>
-        <maven.compiler.source>11</maven.compiler.source>
-        <maven.compiler.target>11</maven.compiler.target>
+        <java.version>11</java.version>
+        <maven.compiler.source>${java.version}</maven.compiler.source>
+        <maven.compiler.target>${java.version}</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
+        <ver.lombok>1.18.30</ver.lombok>
     </properties>
 
     <dependencies>
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
-            <version>1.18.30</version>
+            <version>${ver.lombok}</version>
         </dependency>
     </dependencies>
 
