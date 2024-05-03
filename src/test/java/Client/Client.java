@@ -36,6 +36,9 @@ public class Client {
             clientHelper.sendObject();
             Thread.sleep(3000);
 
+            clientHelper.sendByteArray();
+            Thread.sleep(3000);
+
             clientHelper.close();
             System.out.println("Client : Disconnected from server " + socket.getRemoteSocketAddress());
         } catch (IOException | InterruptedException e) {

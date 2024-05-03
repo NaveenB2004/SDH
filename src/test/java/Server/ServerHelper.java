@@ -29,6 +29,7 @@ import lombok.SneakyThrows;
 import java.awt.*;
 import java.io.IOException;
 import java.net.Socket;
+import java.nio.charset.StandardCharsets;
 
 public class ServerHelper extends SocketDataHandler implements PreUpdateWatcher {
 
@@ -58,6 +59,12 @@ public class ServerHelper extends SocketDataHandler implements PreUpdateWatcher 
         if (update.getDataType() == DataHandler.DataType.OBJECT) {
             SampleObject object = (SampleObject) update.getData();
             System.out.println("Server : Object Details = " + object.toString());
+        }
+
+        if (update.getDataType() == DataHandler.DataType.BYTE_ARRAY) {
+            byte[] bytes = update.getBytes();
+            System.out.println("Server : Byte Array Details = "
+                    + new String(bytes, StandardCharsets.UTF_8));
         }
 
         System.out.println();

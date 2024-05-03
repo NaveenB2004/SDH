@@ -46,7 +46,7 @@ public class DataHandler {
         NONE("0"),
         FILE("1"),
         OBJECT("2"),
-        RAW_BYTES("3");
+        BYTE_ARRAY("3");
 
         private final String value;
 
@@ -61,7 +61,7 @@ public class DataHandler {
                 case "2":
                     return OBJECT;
                 case "3":
-                    return RAW_BYTES;
+                    return BYTE_ARRAY;
                 default:
                     return NONE;
             }
@@ -96,7 +96,7 @@ public class DataHandler {
     public DataHandler(@NonNull String request,
                        byte @NonNull [] byteArray) {
         this.request = request;
-        this.dataType = DataType.RAW_BYTES;
+        this.dataType = DataType.BYTE_ARRAY;
         this.bytes = byteArray;
         UUID = UUIDGenerator++;
     }

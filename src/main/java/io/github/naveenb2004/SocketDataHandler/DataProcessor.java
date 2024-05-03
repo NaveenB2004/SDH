@@ -29,6 +29,7 @@ import java.nio.file.Path;
 public class DataProcessor extends Thread {
     public enum DisconnectStatus {
         SOCKET_CLOSED,
+        SOCKET_CLOSED_SELF,
         OTHER_IO_EXCEPTION_CAUGHT,
         INVALID_HEADER_DETECTED,
         INVALID_OBJECT_RECEIVED
@@ -60,7 +61,7 @@ public class DataProcessor extends Thread {
             long length = file.length();
             header.append(length);
             preDataHandler.setTotalDataSize(length);
-        } else if (dataHandler.getDataType() == DataType.RAW_BYTES) {
+        } else if (dataHandler.getDataType() == DataType.BYTE_ARRAY) {
             header.append(dataHandler.getBytes().length);
         } else {
             header.append("0");
@@ -122,7 +123,7 @@ public class DataProcessor extends Thread {
                     DataHandler dh = new DataHandler(request);
                     DataHandler.DataType dataType = DataHandler.DataType.getType(dataTypeVal);
                     PreDataHandler pdh = null;
-                    if (dataType != DataType.NONE && dataType != DataType.RAW_BYTES) {
+                    if (dataType != DataType.NONE && dataType != DataType.BYTE_ARRAY) {
                         pdh = new PreDataHandler(SOCKET_DATA_HANDLER.getPRE_UPDATE_HANDLER(),
                                 dh.getUUID(), request, PreDataHandler.Method.RECEIVE, dataType);
                         pdh.setTotalDataSize(dataLen);
@@ -134,7 +135,7 @@ public class DataProcessor extends Thread {
                     out = new ByteArrayOutputStream();
 
                     if (dataType != DataType.NONE) {
-                        if (dataType != DataType.RAW_BYTES) {
+                        if (dataType != DataType.BYTE_ARRAY) {
                             long i = 0L;
                             if (dataType == DataType.OBJECT) {
                                 buff = new byte[defaultBufferSize];
@@ -208,12 +209,12 @@ public class DataProcessor extends Thread {
                             while (true) {
                                 if (dataLen <= defaultBufferSize) {
                                     buff = new byte[Math.toIntExact(dataLen)];
-                                    int c = in.read(buff);
-                                    out.write(buff, 0, c);
+                                    in.read(buff);
+                                    out.write(buff);
                                     break;
                                 } else {
-                                    int c = in.read(buff);
-                                    out.write(buff, 0, c);
+                                    in.read(buff);
+                                    out.write(buff);
                                 }
                                 dataLen -= defaultBufferSize;
                             }
@@ -235,7 +236,7 @@ public class DataProcessor extends Thread {
             }
         } catch (IOException e) {
             if (e.getMessage().equals("Socket closed")) {
-                SOCKET_DATA_HANDLER.onDisconnected(DisconnectStatus.SOCKET_CLOSED, e);
+                SOCKET_DATA_HANDLER.onDisconnected(DisconnectStatus.SOCKET_CLOSED_SELF, e);
             } else {
                 SOCKET_DATA_HANDLER.onDisconnected(DisconnectStatus.OTHER_IO_EXCEPTION_CAUGHT, e);
             }
