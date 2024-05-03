@@ -8,12 +8,18 @@
     <artifactId>SocketDataHandler</artifactId>
     <version>1.1.0</version>
 
+    <name>SocketDataHandler</name>
+    <description>Simple library to manage socket communications.</description>
+    <url>https://github.com/NaveenB2004/SocketDataHandler</url>
+    <inceptionYear>2024</inceptionYear>
+
     <properties>
         <java.version>11</java.version>
         <maven.compiler.source>${java.version}</maven.compiler.source>
         <maven.compiler.target>${java.version}</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
+        <!-- dependency versions -->
         <ver.lombok>1.18.30</ver.lombok>
     </properties>
 
@@ -25,4 +31,26 @@
         </dependency>
     </dependencies>
 
+    <licenses>
+        <license>
+            <name></name>
+            <url></url>
+            <distribution></distribution>
+            <comments></comments>
+        </license>
+    </licenses>
+
+    <developers>
+        <developer>
+            <id>NaveenB2004</id>
+            <name>Naveen Balasooriya</name>
+            <email>naveennbalasooriya2004@gmail.com</email>
+            <url>https://github.com/NaveenB2004</url>
+            <timezone>UTC+05:30</timezone>
+            <properties>
+                <!-- messenger platform -->
+                <Telegram>https://t.me/NaveenB2004</Telegram>
+            </properties>
+        </developer>
+    </developers>
 </project>
