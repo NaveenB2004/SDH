@@ -14,11 +14,10 @@
  * limitations under the License.
  */
 
-package com.naveenb2004.SocketDataHandler;
+package io.github.naveenb2004.SocketDataHandler;
 
-import com.naveenb2004.SocketDataHandler.DataHandler.DataType;
-import com.naveenb2004.SocketDataHandler.PreUpdateHandler.PreDataHandler;
-import com.naveenb2004.SocketDataHandler.PreUpdateHandler.PreUpdateHandler;
+import io.github.naveenb2004.SocketDataHandler.PreUpdateHandler.PreDataHandler;
+import io.github.naveenb2004.SocketDataHandler.PreUpdateHandler.PreUpdateHandler;
 import lombok.*;
 
 import java.io.*;
@@ -57,7 +56,7 @@ public abstract class SocketDataHandler implements Closeable {
         OutputStream os = SOCKET.getOutputStream();
         byte[] buffer = new byte[Math.toIntExact(defaultBufferSize)];
         PreDataHandler preDataHandler = null;
-        if (dataHandler.getDataType() != DataType.NONE) {
+        if (dataHandler.getDataType() != DataHandler.DataType.NONE) {
             preDataHandler = new PreDataHandler(PRE_UPDATE_HANDLER, dataHandler.getUUID(),
                     dataHandler.getRequest(), PreDataHandler.Method.SEND, dataHandler.getDataType());
         }
@@ -66,10 +65,10 @@ public abstract class SocketDataHandler implements Closeable {
         os.write(data);
         os.flush();
 
-        if (dataHandler.getDataType() != DataType.NONE) {
+        if (dataHandler.getDataType() != DataHandler.DataType.NONE) {
             FileInputStream fin = null;
             BufferedInputStream bos;
-            if (dataHandler.getDataType() == DataType.FILE) {
+            if (dataHandler.getDataType() == DataHandler.DataType.FILE) {
                 fin = new FileInputStream(dataHandler.getFile());
                 bos = new BufferedInputStream(fin);
             } else {

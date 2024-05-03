@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-package com.naveenb2004.SocketDataHandler;
+package io.github.naveenb2004.SocketDataHandler;
 
-import com.naveenb2004.SocketDataHandler.DataHandler.DataType;
-import com.naveenb2004.SocketDataHandler.PreUpdateHandler.PreDataHandler;
+import io.github.naveenb2004.SocketDataHandler.DataHandler.DataType;
+import io.github.naveenb2004.SocketDataHandler.PreUpdateHandler.PreDataHandler;
 import lombok.Cleanup;
 import lombok.NonNull;
 

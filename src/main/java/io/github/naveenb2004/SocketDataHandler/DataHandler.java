@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.naveenb2004.SocketDataHandler;
+package io.github.naveenb2004.SocketDataHandler;
 
 import lombok.AccessLevel;
 import lombok.Getter;

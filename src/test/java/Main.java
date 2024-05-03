@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import com.naveenb2004.SocketDataHandler.SocketDataHandler;
+import io.github.naveenb2004.SocketDataHandler.SocketDataHandler;
 import lombok.SneakyThrows;
 
 import java.io.File;
