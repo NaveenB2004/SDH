@@ -49,8 +49,8 @@
 
     <licenses>
         <license>
-            <name>Apache License 2.0</name>
-            <url>https://www.apache.org/licenses/LICENSE-2.0</url>
+            <name>The Apache License, Version 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
             <distribution>repo</distribution>
         </license>
     </licenses>
@@ -68,4 +68,30 @@
             </properties>
         </developer>
     </developers>
+
+    <scm>
+        <connection>scm:git:https://github.com/NaveenB2004/SocketDataHandler.git</connection>
+        <developerConnection>scm:git:https://github.com/NaveenB2004/SocketDataHandler.git</developerConnection>
+        <url>https://github.com/NaveenB2004/SocketDataHandler</url>
+    </scm>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+                <version>3.3.1</version>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>3.6.3</version>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-gpg-plugin</artifactId>
+                <version>3.2.4</version>
+            </plugin>
+        </plugins>
+    </build>
 </project>
