@@ -134,74 +134,91 @@ public class DataProcessor extends Thread {
                     out = new ByteArrayOutputStream();
 
                     if (dataType != DataType.NONE) {
-                        long i = 0L;
-                        if (dataType == DataType.OBJECT) {
+                        if (dataType != DataType.RAW_BYTES) {
+                            long i = 0L;
+                            if (dataType == DataType.OBJECT) {
+                                buff = new byte[defaultBufferSize];
+                                while (true) {
+                                    if (dataLen <= defaultBufferSize) {
+                                        buff = new byte[Math.toIntExact(dataLen)];
+                                        int c = in.read(buff);
+                                        out.write(buff, 0, c);
+                                        i += c;
+                                        pdh.setTransferredDataSize(i);
+                                        break;
+                                    } else {
+                                        int c = in.read(buff);
+                                        out.write(buff, 0, c);
+                                        i += c;
+                                        pdh.setTransferredDataSize(i);
+                                    }
+                                    dataLen -= defaultBufferSize;
+                                }
+                                @Cleanup
+                                ByteArrayInputStream bais = new ByteArrayInputStream(out.toByteArray());
+                                @Cleanup
+                                ObjectInputStream ois = new ObjectInputStream(bais);
+
+                                dh.setData((Serializable) ois.readObject());
+                            } else if (dataType == DataType.FILE) {
+                                buff = new byte[1];
+                                while (true) {
+                                    in.read(buff);
+
+                                    if (new String(buff, StandardCharsets.UTF_8).equals("$")) {
+                                        break;
+                                    }
+
+                                    out.write(buff);
+                                }
+
+                                if (!tempFolder.exists()) {
+                                    tempFolder.mkdirs();
+                                }
+                                Path tempFile = Files.createTempFile(tempFolder.toPath(), null,
+                                        "." + out.toString(StandardCharsets.UTF_8));
+                                FileOutputStream fos = new FileOutputStream(tempFile.toFile());
+                                BufferedOutputStream bos = new BufferedOutputStream(fos);
+                                buff = new byte[defaultBufferSize];
+                                while (true) {
+                                    if (dataLen <= defaultBufferSize) {
+                                        buff = new byte[Math.toIntExact(dataLen)];
+                                        int c = in.read(buff);
+                                        bos.write(buff, 0, c);
+                                        i += c;
+                                        pdh.setTransferredDataSize(i);
+                                        break;
+                                    } else {
+                                        int c = in.read(buff);
+                                        bos.write(buff, 0, c);
+                                        i += c;
+                                        pdh.setTransferredDataSize(i);
+                                    }
+                                    dataLen -= defaultBufferSize;
+                                }
+                                bos.close();
+                                fos.close();
+
+                                dh.setFile(tempFile.toFile());
+                            }
+
+                            pdh.setCompleted(true);
+                        } else {
                             buff = new byte[defaultBufferSize];
                             while (true) {
                                 if (dataLen <= defaultBufferSize) {
                                     buff = new byte[Math.toIntExact(dataLen)];
                                     int c = in.read(buff);
                                     out.write(buff, 0, c);
-                                    i += c;
-                                    pdh.setTransferredDataSize(i);
                                     break;
                                 } else {
                                     int c = in.read(buff);
                                     out.write(buff, 0, c);
-                                    i += c;
-                                    pdh.setTransferredDataSize(i);
                                 }
                                 dataLen -= defaultBufferSize;
                             }
-                            @Cleanup
-                            ByteArrayInputStream bais = new ByteArrayInputStream(out.toByteArray());
-                            @Cleanup
-                            ObjectInputStream ois = new ObjectInputStream(bais);
-
-                            dh.setData((Serializable) ois.readObject());
-                        } else if (dataType == DataType.FILE) {
-                            buff = new byte[1];
-                            while (true) {
-                                in.read(buff);
-
-                                if (new String(buff, StandardCharsets.UTF_8).equals("$")) {
-                                    break;
-                                }
-
-                                out.write(buff);
-                            }
-
-                            if (!tempFolder.exists()) {
-                                tempFolder.mkdirs();
-                            }
-                            Path tempFile = Files.createTempFile(tempFolder.toPath(), null,
-                                    "." + out.toString(StandardCharsets.UTF_8));
-                            FileOutputStream fos = new FileOutputStream(tempFile.toFile());
-                            BufferedOutputStream bos = new BufferedOutputStream(fos);
-                            buff = new byte[defaultBufferSize];
-                            while (true) {
-                                if (dataLen <= defaultBufferSize) {
-                                    buff = new byte[Math.toIntExact(dataLen)];
-                                    int c = in.read(buff);
-                                    bos.write(buff, 0, c);
-                                    i += c;
-                                    pdh.setTransferredDataSize(i);
-                                    break;
-                                } else {
-                                    int c = in.read(buff);
-                                    bos.write(buff, 0, c);
-                                    i += c;
-                                    pdh.setTransferredDataSize(i);
-                                }
-                                dataLen -= defaultBufferSize;
-                            }
-                            bos.close();
-                            fos.close();
-
-                            dh.setFile(tempFile.toFile());
+                            dh.setBytes(out.toByteArray());
                         }
-
-                        pdh.setCompleted(true);
                     }
 
                     SOCKET_DATA_HANDLER.onUpdateReceived(dh);
@@ -218,7 +235,7 @@ public class DataProcessor extends Thread {
             }
         } catch (IOException e) {
             if (e.getMessage().equals("Socket closed")) {
-                SOCKET_DATA_HANDLER.onDisconnected(DisconnectStatus.SOCKET_CLOSED, null);
+                SOCKET_DATA_HANDLER.onDisconnected(DisconnectStatus.SOCKET_CLOSED, e);
             } else {
                 SOCKET_DATA_HANDLER.onDisconnected(DisconnectStatus.OTHER_IO_EXCEPTION_CAUGHT, e);
             }
