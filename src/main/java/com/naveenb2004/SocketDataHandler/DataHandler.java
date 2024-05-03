@@ -1,4 +1,4 @@
-package com.naveenb2004;
+package com.naveenb2004.SocketDataHandler;
 
 import lombok.AccessLevel;
 import lombok.Getter;

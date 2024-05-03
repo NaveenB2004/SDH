@@ -1,9 +1,9 @@
 package Client;
 
 import Common.SampleObject;
-import com.naveenb2004.DataHandler;
-import com.naveenb2004.DataProcessor;
-import com.naveenb2004.SocketDataHandler;
+import com.naveenb2004.SocketDataHandler.DataHandler;
+import com.naveenb2004.SocketDataHandler.DataProcessor;
+import com.naveenb2004.SocketDataHandler.SocketDataHandler;
 import lombok.NonNull;
 
 import java.io.File;

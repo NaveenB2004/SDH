@@ -1,8 +1,8 @@
-package com.naveenb2004;
+package com.naveenb2004.SocketDataHandler;
 
-import com.naveenb2004.DataHandler.DataType;
-import com.naveenb2004.PreUpdateHandler.PreDataHandler;
-import com.naveenb2004.PreUpdateHandler.PreUpdateHandler;
+import com.naveenb2004.SocketDataHandler.DataHandler.DataType;
+import com.naveenb2004.SocketDataHandler.PreUpdateHandler.PreDataHandler;
+import com.naveenb2004.SocketDataHandler.PreUpdateHandler.PreUpdateHandler;
 import lombok.*;
 
 import java.io.*;

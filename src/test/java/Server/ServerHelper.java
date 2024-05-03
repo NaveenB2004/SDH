@@ -1,12 +1,12 @@
 package Server;
 
 import Common.SampleObject;
-import com.naveenb2004.DataHandler;
-import com.naveenb2004.DataProcessor;
-import com.naveenb2004.PreUpdateHandler.PreDataHandler;
-import com.naveenb2004.PreUpdateHandler.PreUpdateHandler;
-import com.naveenb2004.PreUpdateHandler.PreUpdateWatcher;
-import com.naveenb2004.SocketDataHandler;
+import com.naveenb2004.SocketDataHandler.DataHandler;
+import com.naveenb2004.SocketDataHandler.DataProcessor;
+import com.naveenb2004.SocketDataHandler.PreUpdateHandler.PreDataHandler;
+import com.naveenb2004.SocketDataHandler.PreUpdateHandler.PreUpdateHandler;
+import com.naveenb2004.SocketDataHandler.PreUpdateHandler.PreUpdateWatcher;
+import com.naveenb2004.SocketDataHandler.SocketDataHandler;
 import lombok.NonNull;
 import lombok.SneakyThrows;
 

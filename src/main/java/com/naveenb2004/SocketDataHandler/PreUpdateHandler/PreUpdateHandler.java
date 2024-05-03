@@ -1,4 +1,4 @@
-package com.naveenb2004.PreUpdateHandler;
+package com.naveenb2004.SocketDataHandler.PreUpdateHandler;
 
 import lombok.NonNull;
 

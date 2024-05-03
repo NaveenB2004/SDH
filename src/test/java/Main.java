@@ -1,4 +1,4 @@
-import com.naveenb2004.SocketDataHandler;
+import com.naveenb2004.SocketDataHandler.SocketDataHandler;
 import lombok.SneakyThrows;
 
 import java.io.File;
