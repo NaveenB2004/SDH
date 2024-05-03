@@ -28,14 +28,13 @@ public abstract class SocketDataHandler implements Closeable {
     @NonNull
     private final Socket SOCKET;
     @Getter
-    private static long defaultBufferSize = 1024L;
+    private static int defaultBufferSize = 1024;
     @Getter
     @Setter
     @NonNull
     private static File tempFolder = new File("Temp");
     @Getter
     private final PreUpdateHandler PRE_UPDATE_HANDLER = new PreUpdateHandler();
-    public String id;
 
     public SocketDataHandler(@NonNull Socket SOCKET) {
         this.SOCKET = SOCKET;
@@ -44,7 +43,7 @@ public abstract class SocketDataHandler implements Closeable {
         DATA_PROCESSOR.start();
     }
 
-    public static void setDefaultBufferSize(long defaultBufferSize) {
+    public static void setDefaultBufferSize(int defaultBufferSize) {
         if (defaultBufferSize <= 0) {
             throw new IllegalArgumentException("Default buffer size must be greater than 0 bytes!");
         }

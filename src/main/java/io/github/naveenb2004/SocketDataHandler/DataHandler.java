@@ -38,12 +38,15 @@ public class DataHandler {
     private Serializable data;
     @Setter(AccessLevel.PROTECTED)
     private File file;
+    @Setter(AccessLevel.PROTECTED)
+    private byte[] bytes;
 
     @Getter
     public enum DataType {
         NONE("0"),
         FILE("1"),
-        OBJECT("2");
+        OBJECT("2"),
+        RAW_BYTES("3");
 
         private final String value;
 
@@ -57,6 +60,8 @@ public class DataHandler {
                     return FILE;
                 case "2":
                     return OBJECT;
+                case "3":
+                    return RAW_BYTES;
                 default:
                     return NONE;
             }
@@ -85,6 +90,14 @@ public class DataHandler {
         this.request = request;
         this.dataType = DataType.FILE;
         this.file = file;
+        UUID = UUIDGenerator++;
+    }
+
+    public DataHandler(@NonNull String request,
+                       byte @NonNull [] byteArray) {
+        this.request = request;
+        this.dataType = DataType.RAW_BYTES;
+        this.bytes = byteArray;
         UUID = UUIDGenerator++;
     }
 

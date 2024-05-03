@@ -26,7 +26,6 @@ public class Client {
             System.out.println("Client : Connected to server on " + socket.getRemoteSocketAddress());
 
             ClientHelper clientHelper = new ClientHelper(socket);
-            clientHelper.id = "CLIENT";
 
             clientHelper.sendText();
             Thread.sleep(3000);

@@ -34,9 +34,8 @@ public class DataProcessor extends Thread {
         INVALID_OBJECT_RECEIVED
     }
 
-    @NonNull
-    protected static byte[] serialize(@NonNull DataHandler dataHandler,
-                                      PreDataHandler preDataHandler) throws IOException {
+    protected static byte @NonNull [] serialize(@NonNull DataHandler dataHandler,
+                                                PreDataHandler preDataHandler) throws IOException {
         ByteArrayOutputStream out;
 
         dataHandler.setTimestamp(DataHandler.timestamp());
@@ -61,6 +60,8 @@ public class DataProcessor extends Thread {
             long length = file.length();
             header.append(length);
             preDataHandler.setTotalDataSize(length);
+        } else if (dataHandler.getDataType() == DataType.RAW_BYTES) {
+            header.append(dataHandler.getBytes().length);
         } else {
             header.append("0");
         }
@@ -89,7 +90,7 @@ public class DataProcessor extends Thread {
             while (true) {
                 int validator = in.read();
                 if (validator == '{') {
-                    long defaultBufferSize = SocketDataHandler.getDefaultBufferSize();
+                    int defaultBufferSize = SocketDataHandler.getDefaultBufferSize();
                     File tempFolder = SocketDataHandler.getTempFolder();
 
                     out = new ByteArrayOutputStream();
@@ -121,7 +122,7 @@ public class DataProcessor extends Thread {
                     DataHandler dh = new DataHandler(request);
                     DataHandler.DataType dataType = DataHandler.DataType.getType(dataTypeVal);
                     PreDataHandler pdh = null;
-                    if (dataType != DataType.NONE) {
+                    if (dataType != DataType.NONE && dataType != DataType.RAW_BYTES) {
                         pdh = new PreDataHandler(SOCKET_DATA_HANDLER.getPRE_UPDATE_HANDLER(),
                                 dh.getUUID(), request, PreDataHandler.Method.RECEIVE, dataType);
                         pdh.setTotalDataSize(dataLen);
@@ -135,7 +136,7 @@ public class DataProcessor extends Thread {
                     if (dataType != DataType.NONE) {
                         long i = 0L;
                         if (dataType == DataType.OBJECT) {
-                            buff = new byte[Math.toIntExact(defaultBufferSize)];
+                            buff = new byte[defaultBufferSize];
                             while (true) {
                                 if (dataLen <= defaultBufferSize) {
                                     buff = new byte[Math.toIntExact(dataLen)];
@@ -177,7 +178,7 @@ public class DataProcessor extends Thread {
                                     "." + out.toString(StandardCharsets.UTF_8));
                             FileOutputStream fos = new FileOutputStream(tempFile.toFile());
                             BufferedOutputStream bos = new BufferedOutputStream(fos);
-                            buff = new byte[Math.toIntExact(defaultBufferSize)];
+                            buff = new byte[defaultBufferSize];
                             while (true) {
                                 if (dataLen <= defaultBufferSize) {
                                     buff = new byte[Math.toIntExact(dataLen)];

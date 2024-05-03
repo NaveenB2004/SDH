@@ -35,7 +35,6 @@ public class Server {
                 System.out.println("Server : Client connected to server on  : " + socket.getRemoteSocketAddress());
 
                 ServerHelper serverHelper = new ServerHelper(socket);
-                serverHelper.id = "SERVER";
 
                 serverHelper.sendText();
             } catch (IOException e) {

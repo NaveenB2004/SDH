@@ -25,7 +25,7 @@ public class Main {
 
     @SneakyThrows
     public static void main(String[] args) {
-        SocketDataHandler.setDefaultBufferSize(1024L);
+        SocketDataHandler.setDefaultBufferSize(1024);
         SocketDataHandler.setTempFolder(new File("Temp"));
 
         new Server.Server().connect(port);
