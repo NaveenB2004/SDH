@@ -25,7 +25,6 @@ import lombok.NonNull;
 import java.io.File;
 import java.io.IOException;
 import java.net.Socket;
-import java.nio.charset.StandardCharsets;
 
 public class ClientHelper extends SocketDataHandler {
 
@@ -89,19 +88,6 @@ public class ClientHelper extends SocketDataHandler {
         try {
             send(dataHandler);
             System.out.println("Client : Object sent!");
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-        System.out.println();
-    }
-
-    protected void sendByteArray() {
-        System.out.println("Client : Sending Byte Array...");
-        DataHandler dataHandler = new DataHandler("/SendByteArray",
-                "This is my byte array".getBytes(StandardCharsets.UTF_8));
-        try {
-            send(dataHandler);
-            System.out.println("Client : Byte Array sent!");
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

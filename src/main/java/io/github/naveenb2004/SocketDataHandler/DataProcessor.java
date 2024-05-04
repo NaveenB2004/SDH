@@ -61,8 +61,6 @@ public class DataProcessor extends Thread {
             long length = file.length();
             header.append(length);
             preDataHandler.setTotalDataSize(length);
-        } else if (dataHandler.getDataType() == DataType.BYTE_ARRAY) {
-            header.append(dataHandler.getBytes().length);
         } else {
             header.append("0");
         }
@@ -123,7 +121,7 @@ public class DataProcessor extends Thread {
                     DataHandler dh = new DataHandler(request);
                     DataHandler.DataType dataType = DataHandler.DataType.getType(dataTypeVal);
                     PreDataHandler pdh = null;
-                    if (dataType != DataType.NONE && dataType != DataType.BYTE_ARRAY) {
+                    if (dataType != DataType.NONE) {
                         pdh = new PreDataHandler(SOCKET_DATA_HANDLER.getPRE_UPDATE_HANDLER(),
                                 dh.getUUID(), request, PreDataHandler.Method.RECEIVE, dataType);
                         pdh.setTotalDataSize(dataLen);
@@ -135,91 +133,74 @@ public class DataProcessor extends Thread {
                     out = new ByteArrayOutputStream();
 
                     if (dataType != DataType.NONE) {
-                        if (dataType != DataType.BYTE_ARRAY) {
-                            long i = 0L;
-                            if (dataType == DataType.OBJECT) {
-                                buff = new byte[defaultBufferSize];
-                                while (true) {
-                                    if (dataLen <= defaultBufferSize) {
-                                        buff = new byte[Math.toIntExact(dataLen)];
-                                        int c = in.read(buff);
-                                        out.write(buff, 0, c);
-                                        i += c;
-                                        pdh.setTransferredDataSize(i);
-                                        break;
-                                    } else {
-                                        int c = in.read(buff);
-                                        out.write(buff, 0, c);
-                                        i += c;
-                                        pdh.setTransferredDataSize(i);
-                                    }
-                                    dataLen -= defaultBufferSize;
-                                }
-                                @Cleanup
-                                ByteArrayInputStream bais = new ByteArrayInputStream(out.toByteArray());
-                                @Cleanup
-                                ObjectInputStream ois = new ObjectInputStream(bais);
-
-                                dh.setData((Serializable) ois.readObject());
-                            } else if (dataType == DataType.FILE) {
-                                buff = new byte[1];
-                                while (true) {
-                                    in.read(buff);
-
-                                    if (new String(buff, StandardCharsets.UTF_8).equals("$")) {
-                                        break;
-                                    }
-
-                                    out.write(buff);
-                                }
-
-                                if (!tempFolder.exists()) {
-                                    tempFolder.mkdirs();
-                                }
-                                Path tempFile = Files.createTempFile(tempFolder.toPath(), null,
-                                        "." + out.toString(StandardCharsets.UTF_8));
-                                FileOutputStream fos = new FileOutputStream(tempFile.toFile());
-                                BufferedOutputStream bos = new BufferedOutputStream(fos);
-                                buff = new byte[defaultBufferSize];
-                                while (true) {
-                                    if (dataLen <= defaultBufferSize) {
-                                        buff = new byte[Math.toIntExact(dataLen)];
-                                        int c = in.read(buff);
-                                        bos.write(buff, 0, c);
-                                        i += c;
-                                        pdh.setTransferredDataSize(i);
-                                        break;
-                                    } else {
-                                        int c = in.read(buff);
-                                        bos.write(buff, 0, c);
-                                        i += c;
-                                        pdh.setTransferredDataSize(i);
-                                    }
-                                    dataLen -= defaultBufferSize;
-                                }
-                                bos.close();
-                                fos.close();
-
-                                dh.setFile(tempFile.toFile());
-                            }
-
-                            pdh.setCompleted(true);
-                        } else {
+                        long i = 0L;
+                        if (dataType == DataType.OBJECT) {
                             buff = new byte[defaultBufferSize];
                             while (true) {
                                 if (dataLen <= defaultBufferSize) {
                                     buff = new byte[Math.toIntExact(dataLen)];
-                                    in.read(buff);
-                                    out.write(buff);
+                                    int c = in.read(buff);
+                                    out.write(buff, 0, c);
+                                    i += c;
+                                    pdh.setTransferredDataSize(i);
                                     break;
                                 } else {
-                                    in.read(buff);
-                                    out.write(buff);
+                                    int c = in.read(buff);
+                                    out.write(buff, 0, c);
+                                    i += c;
+                                    pdh.setTransferredDataSize(i);
                                 }
                                 dataLen -= defaultBufferSize;
                             }
-                            dh.setBytes(out.toByteArray());
+                            @Cleanup
+                            ByteArrayInputStream bais = new ByteArrayInputStream(out.toByteArray());
+                            @Cleanup
+                            ObjectInputStream ois = new ObjectInputStream(bais);
+
+                            dh.setData((Serializable) ois.readObject());
+                        } else if (dataType == DataType.FILE) {
+                            buff = new byte[1];
+                            while (true) {
+                                in.read(buff);
+
+                                if (new String(buff, StandardCharsets.UTF_8).equals("$")) {
+                                    break;
+                                }
+
+                                out.write(buff);
+                            }
+
+                            if (!tempFolder.exists()) {
+                                tempFolder.mkdirs();
+                            }
+                            Path tempFile = Files.createTempFile(tempFolder.toPath(), null,
+                                    "." + out.toString(StandardCharsets.UTF_8));
+                            FileOutputStream fos = new FileOutputStream(tempFile.toFile());
+                            BufferedOutputStream bos = new BufferedOutputStream(fos);
+                            buff = new byte[defaultBufferSize];
+                            while (true) {
+                                if (dataLen <= defaultBufferSize) {
+                                    buff = new byte[Math.toIntExact(dataLen)];
+                                    int c = in.read(buff);
+                                    bos.write(buff, 0, c);
+                                    i += c;
+                                    pdh.setTransferredDataSize(i);
+                                    break;
+                                } else {
+                                    int c = in.read(buff);
+                                    bos.write(buff, 0, c);
+                                    i += c;
+                                    pdh.setTransferredDataSize(i);
+                                }
+                                dataLen -= defaultBufferSize;
+                            }
+                            bos.close();
+                            fos.close();
+
+                            dh.setFile(tempFile.toFile());
                         }
+
+                        pdh.setCompleted(true);
                     }
 
                     SOCKET_DATA_HANDLER.onUpdateReceived(dh);

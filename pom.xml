@@ -118,11 +118,6 @@
                         </goals>
                         <configuration>
                             <keyname>${gpg.key_name}</keyname>
-                            <passphraseServerId>${gpg.key_name}</passphraseServerId>
-                            <gpgArguments>
-                                <arg>--pinentry-mode</arg>
-                                <arg>loopback</arg>
-                            </gpgArguments>
                         </configuration>
                     </execution>
                 </executions>
@@ -136,7 +131,6 @@
                     <publishingServerId>central</publishingServerId>
                     <tokenAuth>true</tokenAuth>
                     <deploymentName>Deployment-${project.version}</deploymentName>
-                    <!-- auto publish for CI -->
                     <autoPublish>false</autoPublish>
                 </configuration>
             </plugin>
