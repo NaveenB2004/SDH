@@ -25,6 +25,7 @@ how, please take a look at the [developer docs](Docs/Dev/README.md).
 
 ## Import? It's easy!
 
+![Minimum JDK version](https://img.shields.io/badge/Minumum_JDK-11-green)
 [![Central Repository](https://img.shields.io/maven-central/v/io.github.naveenb2004/SocketDataHandler
 )](https://central.sonatype.com/artifact/io.github.naveenb2004/SocketDataHandler)\
 If you are using project managers like `Maven`, `Gradle` etc., please take a look at
