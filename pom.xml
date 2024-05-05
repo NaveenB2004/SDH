@@ -25,7 +25,7 @@
     <version>1.1.0</version>
 
     <name>SocketDataHandler</name>
-    <description>A library to simplify socket communications</description>
+    <description>Simple communication handler for Java sockets!</description>
     <url>https://github.com/NaveenB2004/SocketDataHandler</url>
     <inceptionYear>2024</inceptionYear>
 
