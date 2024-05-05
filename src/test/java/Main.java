@@ -25,7 +25,9 @@ public class Main {
 
     @SneakyThrows
     public static void main(String[] args) {
+        // set default maximum buffer size for communications
         SocketDataHandler.setDefaultBufferSize(1024);
+        // set default temporary folder for files downloading
         SocketDataHandler.setTempFolder(new File("Temp"));
 
         new Server.Server().connect(port);

@@ -22,9 +22,11 @@ import java.net.Socket;
 public class Client {
     public void connect(int port) {
         try {
+            // connect to the server
             Socket socket = new Socket("localhost", port);
             System.out.println("Client : Connected to server on " + socket.getRemoteSocketAddress());
 
+            // connect socket with library
             ClientHelper clientHelper = new ClientHelper(socket);
 
             clientHelper.sendText();

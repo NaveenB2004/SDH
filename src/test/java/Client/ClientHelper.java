@@ -34,6 +34,7 @@ public class ClientHelper extends SocketDataHandler {
 
     @Override
     public void onUpdateReceived(@NonNull DataHandler update) {
+        // handle completed update
         System.out.println("Client : Update received!");
         System.out.println("Client : Request = " + update.getRequest());
         System.out.println("Client : Timestamp = " + update.getTimestamp());
@@ -43,12 +44,14 @@ public class ClientHelper extends SocketDataHandler {
 
     @Override
     public void onDisconnected(DataProcessor.@NonNull DisconnectStatus status, Exception exception) {
+        // process disconnections
         System.out.println("Client : " + status);
         if (exception != null) {
             throw new RuntimeException("Client : " + exception);
         }
     }
 
+    // send sample text
     protected void sendText() {
         System.out.println("Client : Sending Text...");
         DataHandler dataHandler = new DataHandler("/SendText");
@@ -61,6 +64,7 @@ public class ClientHelper extends SocketDataHandler {
         System.out.println();
     }
 
+    // send sample file
     protected void sendFile() {
         System.out.println("Client : Sending File...");
         File file = new File("src/test/java/Common/SampleFile.jpg");
@@ -75,6 +79,7 @@ public class ClientHelper extends SocketDataHandler {
         System.out.println();
     }
 
+    // send sample serializable object
     protected void sendObject() {
         System.out.println("Client : Sending Object...");
         SampleObject object = SampleObject.builder()

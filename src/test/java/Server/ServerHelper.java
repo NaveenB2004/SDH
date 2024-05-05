@@ -41,6 +41,7 @@ public class ServerHelper extends SocketDataHandler implements PreUpdateWatcher 
     @SneakyThrows
     @Override
     public void onUpdateReceived(@NonNull DataHandler update) {
+        // handle completed update
         System.out.println("Server : Update received!");
         System.out.println("Server : Request = " + update.getRequest());
         System.out.println("Server : Timestamp = " + update.getTimestamp());
@@ -65,6 +66,7 @@ public class ServerHelper extends SocketDataHandler implements PreUpdateWatcher 
 
     @Override
     public void onDisconnected(DataProcessor.@NonNull DisconnectStatus status, Exception exception) {
+        // process disconnections
         System.out.println("Server : " + status);
         if (exception != null) {
             throw new RuntimeException("Server : " + exception);
@@ -73,6 +75,7 @@ public class ServerHelper extends SocketDataHandler implements PreUpdateWatcher 
 
     @Override
     public void onPreUpdateSeen(@NonNull PreDataHandler preUpdate) {
+        // handle pre-updates
         System.out.println("Server : Pre update received!");
         System.out.println("Server : Request = " + preUpdate.getRequest());
         System.out.println("Server : Update method = " + preUpdate.getMethod());
@@ -83,6 +86,7 @@ public class ServerHelper extends SocketDataHandler implements PreUpdateWatcher 
         System.out.println();
     }
 
+    // send text from server, to client
     protected void sendText() {
         System.out.println("Server : Sending Text...");
         DataHandler dataHandler = new DataHandler("/SendTextByServer");

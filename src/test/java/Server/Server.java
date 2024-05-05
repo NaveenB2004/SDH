@@ -26,14 +26,17 @@ public class Server {
     public void connect(int port) {
         new Thread(() -> {
             try {
+                // create new server socket
                 @Cleanup
                 ServerSocket serverSocket = new ServerSocket(port);
                 System.out.println("Server : Server started on port " + port);
 
                 System.out.println("Server : Waiting for client...");
+                // accept clients
                 Socket socket = serverSocket.accept();
                 System.out.println("Server : Client connected to server on  : " + socket.getRemoteSocketAddress());
 
+                // connect socket with library
                 ServerHelper serverHelper = new ServerHelper(socket);
 
                 serverHelper.sendText();
