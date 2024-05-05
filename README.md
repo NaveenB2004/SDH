@@ -1,11 +1,11 @@
 # Socket Data Handler
 
-`Socket Data Handler` is basically a `communication protocol`, that written in `Java` language. As the basic meaning of
+`Socket Data Handler` is basically a `communication protocol`, that is written in `Java` language. As the basic meaning of
 the `protocol`, this will help users to communicate between other socket connections with a specific method. This is not
 bound to the `text` based communication. In core, it's all about `bytes`. But don't worry, you don't need to work
 directly with bytes! Also, **if you need to use another programming language as the client or server, yes you can!** You
-just need to follow the order of this `protocol` and implement in other language. Also note that, **this library is just
-a `IO` tool and you still need to work on your network and data encryption parts.**
+just need to follow the order of this `protocol` and implement it in other languages. Also note that **this library is just
+an `IO` tool and you still need to work on your network and data encryption parts.**
 
 - [Socket Data Handler](#socket-data-handler)
     - [Why?](#why)
@@ -17,9 +17,9 @@ a `IO` tool and you still need to work on your network and data encryption parts
 
 ## Why?
 
-Socket Data Handler is a fully managed communication library. It means, this library is helps you to low the pain of
-using the default socket input and output mechanism. This library is working on the top of that default system, but
-managed in every possible ways (that I can find and develop with my knowledge and experience XD). If you love to see
+Socket Data Handler is a fully managed communication library. It means this library helps you to lower the pain of
+using the default socket input and output mechanism. This library is working on top of that default system but
+managed in every possible way (that I can find and develop with my knowledge and experience XD). If you wish to see
 how, please take a look at the [developer docs](Docs/Dev/README.md).
 
 ## Import? It's easy!
@@ -41,9 +41,9 @@ You can find most of the import snippets for project managers from there. For `M
 
 ## Usage
 
-- Please refer the [user guids](Docs/User/README.md) to know how this library is going to make your works easy 😎. If you
-  feel lazy to read docs (not recommended), here [some example codes](src/test/java) for you!
-- Please refer the [developer guids](Docs/Dev/README.md) to know how developers are going to smile (or maybe laugh at
+- Please refer to the [user guids](Docs/User/README.md) to know how this library is going to make your work easy 😎. If you
+  feel too lazy to read docs (not recommended), here are [some example codes](src/test/java) for you!
+- Please refer to the [developer guids](Docs/Dev/README.md) to know how developers are going to smile (or maybe laugh at
   me) 😁.
 
 ## Contributions
