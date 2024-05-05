@@ -25,8 +25,8 @@ how, please take a look at the [developer docs](Docs/Dev/README.md).
 
 ## Import? It's easy!
 
-![Central Repository](https://img.shields.io/maven-central/v/io.github.naveenb2004/SocketDataHandler
-)\
+[![Central Repository](https://img.shields.io/maven-central/v/io.github.naveenb2004/SocketDataHandler
+)](https://central.sonatype.com/artifact/io.github.naveenb2004/SocketDataHandler)\
 If you are using project managers like `Maven`, `Gradle` etc., please take a look at
 the [Central repository page for this project](https://central.sonatype.com/artifact/io.github.naveenb2004/SocketDataHandler).
 You can find most of the import snippets for project managers from there. For `Maven`:
