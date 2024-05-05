@@ -13,7 +13,7 @@ a `IO` tool and you still need to work on your network and data encryption parts
     - [Usage](#usage)
     - [Contributions](#contributions)
     - [Issues](#issues)
-        - [License](#license)
+    - [License](#license)
 
 ## Why?
 
