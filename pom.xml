@@ -75,6 +75,11 @@
         <url>https://github.com/NaveenB2004/SocketDataHandler</url>
     </scm>
 
+    <issueManagement>
+        <system>Github</system>
+        <url>https://github.com/NaveenB2004/SocketDataHandler/issues</url>
+    </issueManagement>
+
     <build>
         <plugins>
             <plugin>
