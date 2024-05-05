@@ -11,7 +11,9 @@ a `IO` tool and you still need to work on your network and data encryption parts
     - [Why?](#why)
     - [Import? It's easy!](#import-its-easy)
     - [Usage](#usage)
-    - [License](#license)
+    - [Contributions](#contributions)
+    - [Issues](#issues)
+        - [License](#license)
 
 ## Why?
 
@@ -43,6 +45,14 @@ You can find most of the import snippets for project managers from there. For `M
   feel lazy to read docs (not recommended), here [some example codes](src/test/java) for you!
 - Please refer the [developer guids](Docs/Dev/README.md) to know how developers are going to smile (or maybe laugh at
   me) 😁.
+
+## Contributions
+
+Hey, feel free to fork and open pull requests to this repo! Let's make it better!
+
+## Issues
+
+Any issue? Feel free to slap me [here!](https://github.com/NaveenB2004/SocketDataHandler/issues)
 
 ## License
 
