@@ -39,7 +39,8 @@ You can find most of the import snippets for project managers from there. For `M
 
 ## Usage
 
-- Please refer the [user guids](Docs/User/README.md) to know how this library is going to make your works easy 😎.
+- Please refer the [user guids](Docs/User/README.md) to know how this library is going to make your works easy 😎. If you
+  feel lazy to read docs (not recommended), here [some example codes](src/test/java) for you!
 - Please refer the [developer guids](Docs/Dev/README.md) to know how developers are going to smile (or maybe laugh at
   me) 😁.
 
