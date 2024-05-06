@@ -8,6 +8,7 @@
     - [Receiving pre-updates](#receiving-pre-updates)
     - [Send data](#send-data)
     - [Close socket](#close-socket)
+    - [Further Reading](#further-reading)
 
 ## Import into the project
 
@@ -134,6 +135,11 @@ try {
 }
 ```
 
+## Connection between `onUpdateReceived` and `preUpdateSeen`
+
+When an update received to the `receiver`/`sender`, it automatically give a `UUID (Universally Unique Identifier)` for
+that request/response. If your request/response is eligible for `pre-update` it will automatically share that `UUID`.
+
 ## Close socket
 
 You can either direct close the socket or use `close` method of your receiver class that `extends` with
@@ -146,3 +152,7 @@ try {
     throw new RuntimeException(e);
 }
 ```
+
+## Further reading
+
+Please take a look at the `Java-Doc` to get a clear idea about methods and interfaces. 

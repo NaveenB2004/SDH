@@ -53,7 +53,7 @@ public abstract class SocketDataHandler implements Closeable {
     @Synchronized
     public void send(@NonNull DataHandler dataHandler) throws IOException {
         OutputStream os = SOCKET.getOutputStream();
-        byte[] buffer = new byte[Math.toIntExact(defaultBufferSize)];
+        byte[] buffer = new byte[defaultBufferSize];
         PreDataHandler preDataHandler = null;
         if (dataHandler.getDataType() != DataHandler.DataType.NONE) {
             preDataHandler = new PreDataHandler(PRE_UPDATE_HANDLER, dataHandler.getUUID(),
