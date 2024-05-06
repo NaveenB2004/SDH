@@ -14,25 +14,24 @@
  * limitations under the License.
  */
 
-import io.github.naveenb2004.SocketDataHandler.SocketDataHandler;
-import lombok.SneakyThrows;
+package io.github.naveenb2004.SampleProject.Common;
 
-import java.io.File;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.ToString;
 
-public class Main {
+import java.io.Serializable;
 
-    public static final int port = 2004;
+@Getter
+@ToString
+@Builder
+public class SampleObject implements Serializable {
 
-    @SneakyThrows
-    public static void main(String[] args) {
-        // set default maximum buffer size for communications
-        SocketDataHandler.setDefaultBufferSize(1024);
-        // set default temporary folder for files downloading
-        SocketDataHandler.setTempFolder(new File("Temp"));
+    private static final long serialVersionUID = 123456L;
 
-        new Server.Server().connect(port);
-        Thread.sleep(3000);
-        new Client.Client().connect(port);
-    }
+    private long id;
+    private String name;
+    private int age;
+    private boolean isMale;
 
 }

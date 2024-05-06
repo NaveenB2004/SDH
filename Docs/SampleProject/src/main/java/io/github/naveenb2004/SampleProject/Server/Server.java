@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package Server;
+package io.github.naveenb2004.SampleProject.Server;
 
 import lombok.Cleanup;
 
@@ -23,7 +23,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 
 public class Server {
-    public void connect(int port) {
+    public static void connect(int port) {
         new Thread(() -> {
             try {
                 // create new server socket

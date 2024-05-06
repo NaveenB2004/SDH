@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-package Client;
+package io.github.naveenb2004.SampleProject.Client;
 
 import java.io.IOException;
 import java.net.Socket;
 
 public class Client {
-    public void connect(int port) {
+    public static void connect(int port) {
         try {
             // connect to the server
             Socket socket = new Socket("localhost", port);

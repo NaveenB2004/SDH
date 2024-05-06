@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-package Client;
+package io.github.naveenb2004.SampleProject.Client;
 
-import Common.SampleObject;
+import io.github.naveenb2004.SampleProject.Common.SampleObject;
 import io.github.naveenb2004.SocketDataHandler.DataHandler;
 import io.github.naveenb2004.SocketDataHandler.DataProcessor;
 import io.github.naveenb2004.SocketDataHandler.SocketDataHandler;
@@ -67,7 +67,8 @@ public class ClientHelper extends SocketDataHandler {
     // send sample file
     protected void sendFile() {
         System.out.println("Client : Sending File...");
-        File file = new File("src/test/java/Common/SampleFile.jpg");
+        File file = new File(
+                "Docs/SampleProject/src/main/java/io/github/naveenb2004/SampleProject/Common/SampleFile.jpg");
         DataHandler dataHandler = new DataHandler("/SendFile", file);
 
         try {

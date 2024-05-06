@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-package Server;
+package io.github.naveenb2004.SampleProject.Server;
 
-import Common.SampleObject;
+import io.github.naveenb2004.SampleProject.Common.SampleObject;
 import io.github.naveenb2004.SocketDataHandler.DataHandler;
 import io.github.naveenb2004.SocketDataHandler.DataProcessor;
 import io.github.naveenb2004.SocketDataHandler.PreUpdateHandler.PreDataHandler;
