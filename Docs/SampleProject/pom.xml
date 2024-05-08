@@ -48,7 +48,7 @@
         <dependency>
             <groupId>io.github.naveenb2004</groupId>
             <artifactId>SocketDataHandler</artifactId>
-            <version>1.1.0</version>
+            <version>${ver.SocketDataHandler}</version>
         </dependency>
     </dependencies>
 

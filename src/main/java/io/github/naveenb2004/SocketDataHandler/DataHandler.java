@@ -23,7 +23,7 @@ public class DataHandler {
     protected static long UUIDGenerator = 0L;
 
     private final long UUID;
-    private final String request;
+    private final String REQUEST;
     private long timestamp;
     private DataType dataType;
     private Serializable data;
@@ -73,7 +73,7 @@ public class DataHandler {
         if (request == null) {
             throw new IllegalArgumentException("Request can't be null!");
         }
-        this.request = request;
+        this.REQUEST = request;
         this.dataType = DataType.NONE;
         UUID = UUID();
     }
@@ -85,7 +85,7 @@ public class DataHandler {
         if (data == null) {
             throw new IllegalArgumentException("Data can't be null!");
         }
-        this.request = request;
+        this.REQUEST = request;
         this.dataType = DataType.OBJECT;
         this.data = data;
         UUID = UUID();
@@ -101,7 +101,7 @@ public class DataHandler {
         if (!file.isFile()) {
             throw new IllegalArgumentException("Invalid file!");
         }
-        this.request = request;
+        this.REQUEST = request;
         this.dataType = DataType.FILE;
         this.file = file;
         UUID = UUID();
@@ -112,7 +112,7 @@ public class DataHandler {
     }
 
     public String getRequest() {
-        return request;
+        return REQUEST;
     }
 
     public long getTimestamp() {

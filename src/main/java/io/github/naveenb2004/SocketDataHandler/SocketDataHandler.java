@@ -16,21 +16,20 @@
 
 package io.github.naveenb2004.SocketDataHandler;
 
-
 import java.io.*;
 import java.net.Socket;
 
-public abstract class SocketDataHandler implements Closeable {
+public abstract class SocketDataHandler implements AutoCloseable {
     private final Socket SOCKET;
     private static int defaultBufferSize = 1024;
     private static File tempFolder = new File("Temp");
 
-    public SocketDataHandler(Socket SOCKET) {
-        if (SOCKET == null) {
+    public SocketDataHandler(Socket socket) {
+        if (socket == null) {
             throw new IllegalArgumentException("Socket can't be null!");
         }
 
-        this.SOCKET = SOCKET;
+        this.SOCKET = socket;
         final Thread DATA_PROCESSOR = new DataProcessor(this);
         DATA_PROCESSOR.setName("SocketDataHandler - DataProcessor");
         DATA_PROCESSOR.start();

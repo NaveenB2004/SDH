@@ -23,22 +23,22 @@ public class PreDataHandler {
         RECEIVE
     }
 
-    private final SocketDataHandler socketDataHandler;
+    private final SocketDataHandler SOCKET_DATA_HANDLER;
     private final long UUID;
-    private final String request;
-    private final Method method;
-    private final DataHandler.DataType dataType;
+    private final String REQUEST;
+    private final Method METHOD;
+    private final DataHandler.DataType DATA_TYPE;
     private long totalDataSize;
     private long transferredDataSize;
     private boolean isCompleted;
 
     public PreDataHandler(SocketDataHandler socketDataHandler, long UUID, String request, Method method,
                           DataHandler.DataType dataType) {
-        this.socketDataHandler = socketDataHandler;
+        this.SOCKET_DATA_HANDLER = socketDataHandler;
         this.UUID = UUID;
-        this.request = request;
-        this.method = method;
-        this.dataType = dataType;
+        this.REQUEST = request;
+        this.METHOD = method;
+        this.DATA_TYPE = dataType;
 
         socketDataHandler.onPreUpdateReceived(this);
     }
@@ -48,15 +48,15 @@ public class PreDataHandler {
     }
 
     public String getRequest() {
-        return request;
+        return REQUEST;
     }
 
     public Method getMethod() {
-        return method;
+        return METHOD;
     }
 
     public DataHandler.DataType getDataType() {
-        return dataType;
+        return DATA_TYPE;
     }
 
     public long getTotalDataSize() {
@@ -73,12 +73,12 @@ public class PreDataHandler {
 
     public void setTransferredDataSize(long transferredDataSize) {
         this.transferredDataSize = transferredDataSize;
-        socketDataHandler.onPreUpdateReceived(this);
+        SOCKET_DATA_HANDLER.onPreUpdateReceived(this);
     }
 
     public void setCompleted(boolean isCompleted) {
         this.isCompleted = isCompleted;
-        socketDataHandler.onPreUpdateReceived(this);
+        SOCKET_DATA_HANDLER.onPreUpdateReceived(this);
     }
 
     public void setTotalDataSize(long dataSize) {
