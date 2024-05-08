@@ -66,7 +66,7 @@ public class DataHandler {
     public DataHandler(@NonNull String request) {
         this.request = request;
         this.dataType = DataType.NONE;
-        UUID = UUIDGenerator++;
+        UUID = getUUID();
     }
 
     public DataHandler(@NonNull String request,
@@ -74,7 +74,7 @@ public class DataHandler {
         this.request = request;
         this.dataType = DataType.OBJECT;
         this.data = data;
-        UUID = UUIDGenerator++;
+        UUID = getUUID();
     }
 
     public DataHandler(@NonNull String request,
@@ -85,7 +85,14 @@ public class DataHandler {
         this.request = request;
         this.dataType = DataType.FILE;
         this.file = file;
-        UUID = UUIDGenerator++;
+        UUID = getUUID();
+    }
+
+    private static long getUUID() {
+        if (UUIDGenerator == (2 ^ 63 - 1)) {
+            UUIDGenerator = 0L;
+        }
+        return UUIDGenerator++;
     }
 
     protected static long timestamp() {
