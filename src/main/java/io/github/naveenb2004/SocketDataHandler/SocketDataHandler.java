@@ -16,31 +16,28 @@
 
 package io.github.naveenb2004.SocketDataHandler;
 
-import io.github.naveenb2004.SocketDataHandler.PreUpdateHandler.PreDataHandler;
-import io.github.naveenb2004.SocketDataHandler.PreUpdateHandler.PreUpdateHandler;
-import lombok.*;
 
 import java.io.*;
 import java.net.Socket;
 
 public abstract class SocketDataHandler implements Closeable {
-    @Getter
-    @NonNull
     private final Socket SOCKET;
-    @Getter
     private static int defaultBufferSize = 1024;
-    @Getter
-    @Setter
-    @NonNull
     private static File tempFolder = new File("Temp");
-    @Getter
-    private final PreUpdateHandler PRE_UPDATE_HANDLER = new PreUpdateHandler();
 
-    public SocketDataHandler(@NonNull Socket SOCKET) {
+    public SocketDataHandler(Socket SOCKET) {
+        if (SOCKET == null) {
+            throw new IllegalArgumentException("Socket can't be null!");
+        }
+
         this.SOCKET = SOCKET;
-        Thread DATA_PROCESSOR = new DataProcessor(this);
+        final Thread DATA_PROCESSOR = new DataProcessor(this);
         DATA_PROCESSOR.setName("SocketDataHandler - DataProcessor");
         DATA_PROCESSOR.start();
+    }
+
+    public Socket getSocket() {
+        return this.SOCKET;
     }
 
     public static void setDefaultBufferSize(int defaultBufferSize) {
@@ -50,13 +47,31 @@ public abstract class SocketDataHandler implements Closeable {
         SocketDataHandler.defaultBufferSize = defaultBufferSize;
     }
 
-    @Synchronized
-    public void send(@NonNull DataHandler dataHandler) throws IOException {
+    public static int getDefaultBufferSize() {
+        return defaultBufferSize;
+    }
+
+    public static void setTempFolder(File folder) {
+        if (tempFolder == null) {
+            throw new IllegalArgumentException("Temporary folder can't be null!");
+        }
+        tempFolder = folder;
+    }
+
+    public static File getTempFolder() {
+        return tempFolder;
+    }
+
+    public synchronized void send(DataHandler dataHandler) throws IOException {
+        if (dataHandler == null) {
+            throw new IllegalArgumentException("DataHandler can't be null!");
+        }
+
         OutputStream os = SOCKET.getOutputStream();
         byte[] buffer = new byte[defaultBufferSize];
         PreDataHandler preDataHandler = null;
         if (dataHandler.getDataType() != DataHandler.DataType.NONE) {
-            preDataHandler = new PreDataHandler(PRE_UPDATE_HANDLER, dataHandler.getUUID(),
+            preDataHandler = new PreDataHandler(this, dataHandler.getUUID(),
                     dataHandler.getRequest(), PreDataHandler.Method.SEND, dataHandler.getDataType());
         }
         byte[] data = DataProcessor.serialize(dataHandler, preDataHandler);
@@ -72,10 +87,12 @@ public abstract class SocketDataHandler implements Closeable {
                 bos = new BufferedInputStream(fin);
             } else {
                 ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                @Cleanup
+
                 ObjectOutputStream oos = new ObjectOutputStream(baos);
                 oos.writeObject(dataHandler.getData());
                 oos.flush();
+                oos.close();
+
                 bos = new BufferedInputStream(new ByteArrayInputStream(baos.toByteArray()));
             }
 
@@ -96,9 +113,11 @@ public abstract class SocketDataHandler implements Closeable {
         }
     }
 
-    public abstract void onUpdateReceived(@NonNull DataHandler update);
+    public abstract void onUpdateReceived(DataHandler update);
 
-    public abstract void onDisconnected(@NonNull DataProcessor.DisconnectStatus status, Exception exception);
+    public abstract void onPreUpdateReceived(PreDataHandler preUpdate);
+
+    public abstract void onDisconnected(DataProcessor.DisconnectStatus status, Exception exception);
 
     public void close() throws IOException {
         if (!SOCKET.isClosed()) {

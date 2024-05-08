@@ -16,30 +16,19 @@
 
 package io.github.naveenb2004.SocketDataHandler;
 
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NonNull;
-import lombok.Setter;
-
 import java.io.File;
 import java.io.Serializable;
 
-@Getter
 public class DataHandler {
     protected static long UUIDGenerator = 0L;
 
     private final long UUID;
     private final String request;
-    @Setter(AccessLevel.PROTECTED)
     private long timestamp;
-    @Setter(AccessLevel.PROTECTED)
     private DataType dataType;
-    @Setter(AccessLevel.PROTECTED)
     private Serializable data;
-    @Setter(AccessLevel.PROTECTED)
     private File file;
 
-    @Getter
     public enum DataType {
         NONE("0"),
         FILE("1"),
@@ -51,45 +40,26 @@ public class DataHandler {
             this.value = value;
         }
 
-        static DataType getType(@NonNull String value) {
+        String getValue() {
+            return value;
+        }
+
+        static DataType getType(String value) {
             switch (value) {
+                case "0":
+                    return NONE;
                 case "1":
                     return FILE;
                 case "2":
                     return OBJECT;
                 default:
-                    return NONE;
+                    throw new IllegalArgumentException("Invalid value!");
             }
         }
     }
 
-    public DataHandler(@NonNull String request) {
-        this.request = request;
-        this.dataType = DataType.NONE;
-        UUID = getUUID();
-    }
-
-    public DataHandler(@NonNull String request,
-                       @NonNull Serializable data) {
-        this.request = request;
-        this.dataType = DataType.OBJECT;
-        this.data = data;
-        UUID = getUUID();
-    }
-
-    public DataHandler(@NonNull String request,
-                       @NonNull File file) {
-        if (!file.isFile()) {
-            throw new IllegalArgumentException("Invalid file!");
-        }
-        this.request = request;
-        this.dataType = DataType.FILE;
-        this.file = file;
-        UUID = getUUID();
-    }
-
-    private static long getUUID() {
-        if (UUIDGenerator == (2 ^ 63 - 1)) {
+    private static long UUID() {
+        if (UUIDGenerator == Long.MAX_VALUE) {
             UUIDGenerator = 0L;
         }
         return UUIDGenerator++;
@@ -97,5 +67,83 @@ public class DataHandler {
 
     protected static long timestamp() {
         return System.currentTimeMillis();
+    }
+
+    public DataHandler(String request) {
+        if (request == null) {
+            throw new IllegalArgumentException("Request can't be null!");
+        }
+        this.request = request;
+        this.dataType = DataType.NONE;
+        UUID = UUID();
+    }
+
+    public DataHandler(String request, Serializable data) {
+        if (request == null) {
+            throw new IllegalArgumentException("Request can't be null!");
+        }
+        if (data == null) {
+            throw new IllegalArgumentException("Data can't be null!");
+        }
+        this.request = request;
+        this.dataType = DataType.OBJECT;
+        this.data = data;
+        UUID = UUID();
+    }
+
+    public DataHandler(String request, File file) {
+        if (request == null) {
+            throw new IllegalArgumentException("Request can't be null!");
+        }
+        if (file == null) {
+            throw new IllegalArgumentException("File can't be null!");
+        }
+        if (!file.isFile()) {
+            throw new IllegalArgumentException("Invalid file!");
+        }
+        this.request = request;
+        this.dataType = DataType.FILE;
+        this.file = file;
+        UUID = UUID();
+    }
+
+    public long getUUID() {
+        return UUID;
+    }
+
+    public String getRequest() {
+        return request;
+    }
+
+    public long getTimestamp() {
+        return timestamp;
+    }
+
+    protected void setTimestamp(long timestamp) {
+        this.timestamp = timestamp;
+    }
+
+    public DataType getDataType() {
+        return dataType;
+    }
+
+    protected void setDataType(DataType dataType) {
+        this.dataType = dataType;
+    }
+
+    public Serializable getData() {
+        return data;
+    }
+
+    protected void setData(Serializable data) {
+        this.data = data;
+    }
+
+    public File getFile() {
+        return file;
+    }
+
+    protected void setFile(File file) {
+        this.file = file;
     }
 }

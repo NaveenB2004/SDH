@@ -14,48 +14,74 @@
  * limitations under the License.
  */
 
-package io.github.naveenb2004.SocketDataHandler.PreUpdateHandler;
+package io.github.naveenb2004.SocketDataHandler;
 
-import io.github.naveenb2004.SocketDataHandler.DataHandler;
-import lombok.Getter;
-import lombok.NonNull;
-import lombok.Setter;
 
-@Getter
 public class PreDataHandler {
     public enum Method {
         SEND,
         RECEIVE
     }
 
-    private final PreUpdateHandler preUpdateHandler;
+    private final SocketDataHandler socketDataHandler;
     private final long UUID;
     private final String request;
     private final Method method;
     private final DataHandler.DataType dataType;
-    @Setter
     private long totalDataSize;
     private long transferredDataSize;
     private boolean isCompleted;
 
-    public PreDataHandler(@NonNull PreUpdateHandler preUpdateHandler, long UUID, @NonNull String request,
-                          @NonNull Method method, @NonNull DataHandler.DataType dataType) {
-        this.preUpdateHandler = preUpdateHandler;
+    public PreDataHandler(SocketDataHandler socketDataHandler, long UUID, String request, Method method,
+                          DataHandler.DataType dataType) {
+        this.socketDataHandler = socketDataHandler;
         this.UUID = UUID;
         this.request = request;
         this.method = method;
         this.dataType = dataType;
 
-        preUpdateHandler.update(this);
+        socketDataHandler.onPreUpdateReceived(this);
+    }
+
+    public long getUUID() {
+        return UUID;
+    }
+
+    public String getRequest() {
+        return request;
+    }
+
+    public Method getMethod() {
+        return method;
+    }
+
+    public DataHandler.DataType getDataType() {
+        return dataType;
+    }
+
+    public long getTotalDataSize() {
+        return totalDataSize;
+    }
+
+    public long getTransferredDataSize() {
+        return transferredDataSize;
+    }
+
+    public boolean isCompleted() {
+        return isCompleted;
     }
 
     public void setTransferredDataSize(long transferredDataSize) {
         this.transferredDataSize = transferredDataSize;
-        preUpdateHandler.update(this);
+        socketDataHandler.onPreUpdateReceived(this);
     }
 
     public void setCompleted(boolean isCompleted) {
         this.isCompleted = isCompleted;
-        preUpdateHandler.update(this);
+        socketDataHandler.onPreUpdateReceived(this);
+    }
+
+    public void setTotalDataSize(long dataSize) {
+        this.totalDataSize = dataSize;
     }
 }

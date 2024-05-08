@@ -17,9 +17,6 @@
 package io.github.naveenb2004.SocketDataHandler;
 
 import io.github.naveenb2004.SocketDataHandler.DataHandler.DataType;
-import io.github.naveenb2004.SocketDataHandler.PreUpdateHandler.PreDataHandler;
-import lombok.Cleanup;
-import lombok.NonNull;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
@@ -35,8 +32,7 @@ public class DataProcessor extends Thread {
         INVALID_OBJECT_RECEIVED
     }
 
-    protected static byte @NonNull [] serialize(@NonNull DataHandler dataHandler,
-                                                PreDataHandler preDataHandler) throws IOException {
+    protected static byte[] serialize(DataHandler dataHandler, PreDataHandler preDataHandler) throws IOException {
         ByteArrayOutputStream out;
 
         dataHandler.setTimestamp(DataHandler.timestamp());
@@ -48,10 +44,12 @@ public class DataProcessor extends Thread {
         String suffix = "";
         if (dataHandler.getDataType() == DataType.OBJECT) {
             out = new ByteArrayOutputStream();
-            @Cleanup
+
             ObjectOutputStream oOut = new ObjectOutputStream(out);
             oOut.writeObject(dataHandler.getData());
             oOut.flush();
+            oOut.close();
+
             long length = out.toByteArray().length;
             header.append(length);
             preDataHandler.setTotalDataSize(length);
@@ -73,17 +71,17 @@ public class DataProcessor extends Thread {
         return out.toByteArray();
     }
 
-    @NonNull
+
     private final SocketDataHandler SOCKET_DATA_HANDLER;
 
-    protected DataProcessor(@NonNull SocketDataHandler socketDataHandler) {
+    protected DataProcessor(SocketDataHandler socketDataHandler) {
         this.SOCKET_DATA_HANDLER = socketDataHandler;
     }
 
     @Override
     public void run() {
         try {
-            InputStream in = SOCKET_DATA_HANDLER.getSOCKET().getInputStream();
+            InputStream in = SOCKET_DATA_HANDLER.getSocket().getInputStream();
             ByteArrayOutputStream out;
             byte[] buff;
             while (true) {
@@ -122,8 +120,8 @@ public class DataProcessor extends Thread {
                     DataHandler.DataType dataType = DataHandler.DataType.getType(dataTypeVal);
                     PreDataHandler pdh = null;
                     if (dataType != DataType.NONE) {
-                        pdh = new PreDataHandler(SOCKET_DATA_HANDLER.getPRE_UPDATE_HANDLER(),
-                                dh.getUUID(), request, PreDataHandler.Method.RECEIVE, dataType);
+                        pdh = new PreDataHandler(SOCKET_DATA_HANDLER, dh.getUUID(), request,
+                                PreDataHandler.Method.RECEIVE, dataType);
                         pdh.setTotalDataSize(dataLen);
                     }
 
@@ -152,12 +150,13 @@ public class DataProcessor extends Thread {
                                 }
                                 dataLen -= defaultBufferSize;
                             }
-                            @Cleanup
                             ByteArrayInputStream bais = new ByteArrayInputStream(out.toByteArray());
-                            @Cleanup
                             ObjectInputStream ois = new ObjectInputStream(bais);
 
                             dh.setData((Serializable) ois.readObject());
+
+                            ois.close();
+                            bais.close();
                         } else if (dataType == DataType.FILE) {
                             buff = new byte[1];
                             while (true) {
