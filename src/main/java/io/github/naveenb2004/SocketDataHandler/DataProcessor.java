@@ -24,6 +24,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 public class DataProcessor extends Thread {
+    /**
+     * Disconnect status (cause) of the socket connection.
+     */
     public enum DisconnectStatus {
         SOCKET_CLOSED,
         SOCKET_CLOSED_SELF,
@@ -32,6 +35,13 @@ public class DataProcessor extends Thread {
         INVALID_OBJECT_RECEIVED
     }
 
+    /**
+     * Make headers for data transmit. This method is only for in-library use.
+     * @param dataHandler    Data bundle
+     * @param preDataHandler Pre update handler
+     * @return Bytes array of the header
+     * @throws IOException Error while processing data
+     */
     protected static byte[] serialize(DataHandler dataHandler, PreDataHandler preDataHandler) throws IOException {
         ByteArrayOutputStream out;
 
@@ -74,6 +84,10 @@ public class DataProcessor extends Thread {
 
     private final SocketDataHandler SOCKET_DATA_HANDLER;
 
+    /**
+     * This constructor is basically for start the receiver. This is only for in-library use.
+     * @param socketDataHandler <code>SocketDataHandler</code>
+     */
     protected DataProcessor(SocketDataHandler socketDataHandler) {
         this.SOCKET_DATA_HANDLER = socketDataHandler;
     }
