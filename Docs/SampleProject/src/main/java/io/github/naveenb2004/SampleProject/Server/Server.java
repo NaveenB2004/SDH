@@ -16,8 +16,6 @@
 
 package io.github.naveenb2004.SampleProject.Server;
 
-import lombok.Cleanup;
-
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -27,7 +25,6 @@ public class Server {
         new Thread(() -> {
             try {
                 // create new server socket
-                @Cleanup
                 ServerSocket serverSocket = new ServerSocket(port);
                 System.out.println("Server : Server started on port " + port);
 

@@ -19,8 +19,8 @@ package io.github.naveenb2004.SampleProject.Client;
 import io.github.naveenb2004.SampleProject.Common.SampleObject;
 import io.github.naveenb2004.SocketDataHandler.DataHandler;
 import io.github.naveenb2004.SocketDataHandler.DataProcessor;
+import io.github.naveenb2004.SocketDataHandler.PreDataHandler;
 import io.github.naveenb2004.SocketDataHandler.SocketDataHandler;
-import lombok.NonNull;
 
 import java.io.File;
 import java.io.IOException;
@@ -28,12 +28,12 @@ import java.net.Socket;
 
 public class ClientHelper extends SocketDataHandler {
 
-    public ClientHelper(@NonNull Socket SOCKET) {
+    public ClientHelper(final Socket SOCKET) {
         super(SOCKET);
     }
 
     @Override
-    public void onUpdateReceived(@NonNull DataHandler update) {
+    public void onUpdateReceived(DataHandler update) {
         // handle completed update
         System.out.println("Client : Update received!");
         System.out.println("Client : Request = " + update.getRequest());
@@ -43,7 +43,12 @@ public class ClientHelper extends SocketDataHandler {
     }
 
     @Override
-    public void onDisconnected(DataProcessor.@NonNull DisconnectStatus status, Exception exception) {
+    public void onPreUpdateReceived(PreDataHandler preUpdate) {
+        // implement it!
+    }
+
+    @Override
+    public void onDisconnected(DataProcessor.DisconnectStatus status, Exception exception) {
         // process disconnections
         System.out.println("Client : " + status);
         if (exception != null) {

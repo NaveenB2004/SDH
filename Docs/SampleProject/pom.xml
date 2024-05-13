@@ -22,7 +22,7 @@
 
     <groupId>io.github.naveenb2004</groupId>
     <artifactId>SampleProject</artifactId>
-    <version>1.1.0</version>
+    <version>1.2.0</version>
 
     <name>SampleProject</name>
     <description>Sample codes for Socket Data Handler!</description>
@@ -34,21 +34,13 @@
         <maven.compiler.source>${java.version}</maven.compiler.source>
         <maven.compiler.target>${java.version}</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <!-- dependency versions -->
-        <ver.lombok>1.18.30</ver.lombok>
-        <ver.SocketDataHandler>1.1.0</ver.SocketDataHandler>
     </properties>
 
     <dependencies>
         <dependency>
-            <groupId>org.projectlombok</groupId>
-            <artifactId>lombok</artifactId>
-            <version>${ver.lombok}</version>
-        </dependency>
-        <dependency>
             <groupId>io.github.naveenb2004</groupId>
             <artifactId>SocketDataHandler</artifactId>
-            <version>${ver.SocketDataHandler}</version>
+            <version>1.2.0</version>
         </dependency>
     </dependencies>
 

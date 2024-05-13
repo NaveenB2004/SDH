@@ -16,22 +16,60 @@
 
 package io.github.naveenb2004.SampleProject.Common;
 
-import lombok.Builder;
-import lombok.Getter;
-import lombok.ToString;
-
 import java.io.Serializable;
 
-@Getter
-@ToString
-@Builder
 public class SampleObject implements Serializable {
 
     private static final long serialVersionUID = 123456L;
 
-    private long id;
-    private String name;
-    private int age;
-    private boolean isMale;
+    private final long id;
+    private final String name;
+    private final int age;
+    private final boolean isMale;
 
+    private SampleObject(long id, String name, int age, boolean isMale) {
+        this.id = id;
+        this.name = name;
+        this.age = age;
+        this.isMale = isMale;
+    }
+
+    public String toString() {
+        return "id = " + id + ", name = " + name + ", age = " + age + ", isMale = " + isMale;
+    }
+
+    public static SampleObjectBuilder builder() {
+        return new SampleObjectBuilder();
+    }
+
+    public static class SampleObjectBuilder {
+        private long id;
+        private String name;
+        private int age;
+        private boolean isMale;
+
+        public SampleObjectBuilder id(long id) {
+            this.id = id;
+            return this;
+        }
+
+        public SampleObjectBuilder name(String name) {
+            this.name = name;
+            return this;
+        }
+
+        public SampleObjectBuilder age(int age) {
+            this.age = age;
+            return this;
+        }
+
+        public SampleObjectBuilder isMale(boolean isMale) {
+            this.isMale = isMale;
+            return this;
+        }
+
+        public SampleObject build() {
+            return new SampleObject(id, name, age, isMale);
+        }
+    }
 }

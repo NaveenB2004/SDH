@@ -19,23 +19,30 @@ package io.github.naveenb2004.SampleProject;
 import io.github.naveenb2004.SampleProject.Client.Client;
 import io.github.naveenb2004.SampleProject.Server.Server;
 import io.github.naveenb2004.SocketDataHandler.SocketDataHandler;
-import lombok.SneakyThrows;
 
 import java.io.File;
 
 public class Main {
 
+    // socket port
     public static final int port = 2004;
 
-    @SneakyThrows
     public static void main(String[] args) {
         // set default maximum buffer size for communications
         SocketDataHandler.setDefaultBufferSize(1024);
         // set default temporary folder for files downloading
         SocketDataHandler.setTempFolder(new File("Temp"));
 
+        // open server socket
         Server.connect(port);
-        Thread.sleep(3000);
+
+        try {
+            Thread.sleep(3000);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+
+        // connect with the server
         Client.connect(port);
     }
 
