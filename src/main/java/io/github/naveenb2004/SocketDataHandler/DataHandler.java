@@ -16,33 +16,35 @@
 
 package io.github.naveenb2004.SocketDataHandler;
 
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NonNull;
-import lombok.Setter;
-
 import java.io.File;
 import java.io.Serializable;
 
-@Getter
 public class DataHandler {
+    // handle UUIDs
     protected static long UUIDGenerator = 0L;
 
     private final long UUID;
-    private final String request;
-    @Setter(AccessLevel.PROTECTED)
+    private final String REQUEST;
     private long timestamp;
-    @Setter(AccessLevel.PROTECTED)
     private DataType dataType;
-    @Setter(AccessLevel.PROTECTED)
     private Serializable data;
-    @Setter(AccessLevel.PROTECTED)
     private File file;
 
-    @Getter
+    /**
+     * Automatically assigned data type for DataHandler.
+     */
     public enum DataType {
+        /**
+         * No specific data. Just request.
+         */
         NONE("0"),
+        /**
+         * java.io.File
+         */
         FILE("1"),
+        /**
+         * Any <code>serializable</code> object
+         */
         OBJECT("2");
 
         private final String value;
@@ -51,44 +53,183 @@ public class DataHandler {
             this.value = value;
         }
 
-        static DataType getType(@NonNull String value) {
+        String getValue() {
+            return value;
+        }
+
+        static DataType getType(String value) {
             switch (value) {
+                case "0":
+                    return NONE;
                 case "1":
                     return FILE;
                 case "2":
                     return OBJECT;
                 default:
-                    return NONE;
+                    throw new IllegalArgumentException("Invalid value!");
             }
         }
     }
 
-    public DataHandler(@NonNull String request) {
-        this.request = request;
-        this.dataType = DataType.NONE;
-        UUID = UUIDGenerator++;
+    /**
+     * Process the UUIDs for  DataHandler objects
+     * @return UUID
+     */
+    private static long UUID() {
+        if (UUIDGenerator == Long.MAX_VALUE) {
+            UUIDGenerator = 0L;
+        }
+        return UUIDGenerator++;
     }
 
-    public DataHandler(@NonNull String request,
-                       @NonNull Serializable data) {
-        this.request = request;
+    /**
+     * Get the current timestamp.
+     * @return Current timestamp in milliseconds
+     * @see System#currentTimeMillis()
+     */
+    protected static long timestamp() {
+        return System.currentTimeMillis();
+    }
+
+    /**
+     * Data bundle with only request.
+     * @param request Request string
+     */
+    public DataHandler(String request) {
+        if (request == null) {
+            throw new IllegalArgumentException("Request can't be null!");
+        }
+        this.REQUEST = request;
+        this.dataType = DataType.NONE;
+        UUID = UUID();
+    }
+
+    /**
+     * Data bundle with <code>Serializable</code> object.
+     * @param request Request string
+     * @param data    Serializable object
+     * @see Serializable
+     */
+    public DataHandler(String request, Serializable data) {
+        if (request == null) {
+            throw new IllegalArgumentException("Request can't be null!");
+        }
+        if (data == null) {
+            throw new IllegalArgumentException("Data can't be null!");
+        }
+        this.REQUEST = request;
         this.dataType = DataType.OBJECT;
         this.data = data;
-        UUID = UUIDGenerator++;
+        UUID = UUID();
     }
 
-    public DataHandler(@NonNull String request,
-                       @NonNull File file) {
+    /**
+     * Data bundle with <code>File</code>
+     * @param request Request string
+     * @param file    java.io.File
+     * @see java.io.File
+     */
+    public DataHandler(String request, File file) {
+        if (request == null) {
+            throw new IllegalArgumentException("Request can't be null!");
+        }
+        if (file == null) {
+            throw new IllegalArgumentException("File can't be null!");
+        }
         if (!file.isFile()) {
             throw new IllegalArgumentException("Invalid file!");
         }
-        this.request = request;
+        this.REQUEST = request;
         this.dataType = DataType.FILE;
         this.file = file;
-        UUID = UUIDGenerator++;
+        UUID = UUID();
     }
 
-    protected static long timestamp() {
-        return System.currentTimeMillis();
+    /**
+     * Get the UUID
+     * @return UUID
+     */
+    public long getUUID() {
+        return UUID;
+    }
+
+    /**
+     * Get the request string
+     * @return Request string
+     */
+    public String getRequest() {
+        return REQUEST;
+    }
+
+    /**
+     * Get the timestamp
+     * @return Timestamp in milliseconds
+     * @see System#currentTimeMillis()
+     */
+    public long getTimestamp() {
+        return timestamp;
+    }
+
+    /**
+     * Set the timestamp. This method is only for in-library use.
+     * @param timestamp Timestamp in milliseconds
+     * @see System#currentTimeMillis()
+     */
+    protected void setTimestamp(long timestamp) {
+        this.timestamp = timestamp;
+    }
+
+    /**
+     * Get the data type
+     * @return Data type
+     * @see DataType
+     */
+    public DataType getDataType() {
+        return dataType;
+    }
+
+    /**
+     * Set the data type. This method is only for in-library use.
+     * @param dataType Data type
+     * @see DataType
+     */
+    protected void setDataType(DataType dataType) {
+        this.dataType = dataType;
+    }
+
+    /**
+     * Get the serializable object (if any).
+     * @return Serializable object
+     * @see Serializable
+     */
+    public Serializable getData() {
+        return data;
+    }
+
+    /**
+     * Set the serializable object (if any). This method is only for in-library use.
+     * @param data Serializable object
+     * @see Serializable
+     */
+    protected void setData(Serializable data) {
+        this.data = data;
+    }
+
+    /**
+     * Get the <code>java.io.File</code> (if any).
+     * @return <code>java.io.File</code>
+     * @see java.io.File
+     */
+    public File getFile() {
+        return file;
+    }
+
+    /**
+     * Set the <code>java.io.File</code> (if any). This method is only for in-library use.
+     * @param file <code>java.io.File</code>
+     * @see java.io.File
+     */
+    protected void setFile(File file) {
+        this.file = file;
     }
 }

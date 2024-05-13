@@ -19,28 +19,21 @@ package io.github.naveenb2004.SampleProject.Server;
 import io.github.naveenb2004.SampleProject.Common.SampleObject;
 import io.github.naveenb2004.SocketDataHandler.DataHandler;
 import io.github.naveenb2004.SocketDataHandler.DataProcessor;
-import io.github.naveenb2004.SocketDataHandler.PreUpdateHandler.PreDataHandler;
-import io.github.naveenb2004.SocketDataHandler.PreUpdateHandler.PreUpdateHandler;
-import io.github.naveenb2004.SocketDataHandler.PreUpdateHandler.PreUpdateWatcher;
+import io.github.naveenb2004.SocketDataHandler.PreDataHandler;
 import io.github.naveenb2004.SocketDataHandler.SocketDataHandler;
-import lombok.NonNull;
-import lombok.SneakyThrows;
 
 import java.awt.*;
 import java.io.IOException;
 import java.net.Socket;
 
-public class ServerHelper extends SocketDataHandler implements PreUpdateWatcher {
+public class ServerHelper extends SocketDataHandler {
 
-    public ServerHelper(@NonNull final Socket SOCKET) {
+    public ServerHelper(final Socket SOCKET) {
         super(SOCKET);
-        PreUpdateHandler preUpdateHandler = getPRE_UPDATE_HANDLER();
-        preUpdateHandler.addWatcher(this);
     }
 
-    @SneakyThrows
     @Override
-    public void onUpdateReceived(@NonNull DataHandler update) {
+    public void onUpdateReceived(DataHandler update) {
         // handle completed update
         System.out.println("Server : Update received!");
         System.out.println("Server : Request = " + update.getRequest());
@@ -65,16 +58,7 @@ public class ServerHelper extends SocketDataHandler implements PreUpdateWatcher 
     }
 
     @Override
-    public void onDisconnected(DataProcessor.@NonNull DisconnectStatus status, Exception exception) {
-        // process disconnections
-        System.out.println("Server : " + status);
-        if (exception != null) {
-            throw new RuntimeException("Server : " + exception);
-        }
-    }
-
-    @Override
-    public void onPreUpdateSeen(@NonNull PreDataHandler preUpdate) {
+    public void onPreUpdateReceived(PreDataHandler preUpdate) {
         // handle pre-updates
         System.out.println("Server : Pre update received!");
         System.out.println("Server : Request = " + preUpdate.getRequest());
@@ -84,6 +68,15 @@ public class ServerHelper extends SocketDataHandler implements PreUpdateWatcher 
         System.out.println("Server : Transferred data size = " + preUpdate.getTransferredDataSize());
         System.out.println("Server : Is completed = " + preUpdate.isCompleted());
         System.out.println();
+    }
+
+    @Override
+    public void onDisconnected(DataProcessor.DisconnectStatus status, Exception exception) {
+        // process disconnections
+        System.out.println("Server : " + status);
+        if (exception != null) {
+            throw new RuntimeException("Server : " + exception);
+        }
     }
 
     // send text from server, to client
