@@ -1,6 +1,7 @@
 target/
 Temp/
-Docs/SampleProject/target/
+SampleProject/target/
+SampleProject/Temp/
 !.mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
 !**/src/test/**/target/

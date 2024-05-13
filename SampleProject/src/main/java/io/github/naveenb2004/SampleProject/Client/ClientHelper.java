@@ -73,7 +73,7 @@ public class ClientHelper extends SocketDataHandler {
     protected void sendFile() {
         System.out.println("Client : Sending File...");
         File file = new File(
-                "Docs/SampleProject/src/main/java/io/github/naveenb2004/SampleProject/Common/SampleFile.jpg");
+                "src/main/java/io/github/naveenb2004/SampleProject/Common/SampleFile.jpg");
         DataHandler dataHandler = new DataHandler("/SendFile", file);
 
         try {
