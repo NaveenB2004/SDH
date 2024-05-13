@@ -199,7 +199,7 @@ public class DataProcessor extends Thread {
                             dh.setFile(tempFile.toFile());
                         }
 
-                        pdh.setCompleted(true);
+                        pdh.setCompleted();
                     }
 
                     SOCKET_DATA_HANDLER.onUpdateReceived(dh);
